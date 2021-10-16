@@ -11,9 +11,9 @@ import pprint
 key = {"kty": "EC",
        "alg": "ES256",
        "crv": "P-256",
-       "x": "AZdaliLhQR9j2gYwvrvM12QekaM4q1sAy6uzw4NpBW0",
-       "y": "uWvlqax96hXgeq6ZrePX18aJ2Y3eAIa0o6jA_6ySFts",
-       "d": "iL8qdHXJ3nftqyWgWRBC5vgLSEJs_Rjt8VoBgsTJPSA"}
+       "x": "KEY",
+       "y": "EXAMPLE",
+       "d": "EXAMPLE"} # ключи изменены
 
 
 def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC'):
