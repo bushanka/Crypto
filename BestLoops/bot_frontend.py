@@ -54,11 +54,28 @@ pay_methods_kb.add(button_pay_tinkoff, button_pay_sber, button_pay_tinkoff_and_s
 
 sub_settings_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 sub_settings_kb.add(button_exchanges, button_money_settings, button_settings_exit)
-# Table create if not exist
-conn = sqlite3.connect('data.db')
-cur = conn.cursor()
 
-cur.execute("""CREATE TABLE IF NOT EXISTS users_data(
+
+def sql_command(command_text, params=None):
+    try:
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+        if params is None:
+            cursor.execute(command_text)
+            data = cursor.fetchall()
+        else:
+            cursor.execute(command_text, params)
+            data = cursor.fetchall()
+        connection.commit()
+        cursor.close()
+    except qlite3.Error as error:
+        print("Error while connecting to sqlite", error)
+    finally:
+        if (connection):
+            connection.close()
+    return data
+
+sql_command("""CREATE TABLE IF NOT EXISTS users_data(
 "userid" INT PRIMARY KEY,
 "username" TEXT,
 "subscriber" INTEGER DEFAULT 0,
@@ -72,24 +89,45 @@ cur.execute("""CREATE TABLE IF NOT EXISTS users_data(
 "is_binance_eth" INTEGER DEFAULT 1,
 "is_binance_btc" INTEGER DEFAULT 1);""")
 
-conn.commit()
+#conn = sqlite3.connect('data.db')
+#cur = conn.cursor()
 
+#cur.execute("""CREATE TABLE IF NOT EXISTS users_data(
+#"userid" INT PRIMARY KEY,
+#"username" TEXT,
+#"subscriber" INTEGER DEFAULT 0,
+#"volume" TEXT DEFAULT 100000,
+#"payment_methods" TEXT DEFAULT 'Tinkoff',
+#"test_access" TEXT DEFAULT 'Yes',
+#"time_subscribe" TEXT,
+#"percent" REAL DEFAULT 0,
+#"min_amount" INTEGER DEFAULT 5000,
+#"is_binance_usdt" INTEGER DEFAULT 1,
+#"is_binance_eth" INTEGER DEFAULT 1,
+#"is_binance_btc" INTEGER DEFAULT 1);""")
+
+#conn.commit()
+#cur.close()
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     message_user = [message.chat.id, message.chat.username]
-    cur.execute("SELECT userid FROM users_data WHERE userid = ?;", (message_user[0],))
-    data = cur.fetchone()
+    data = sql_command("SELECT userid FROM users_data WHERE userid = ?;", params=(message_user[0],))
+    #cur.execute("SELECT userid FROM users_data WHERE userid = ?;", (message_user[0],))
+    #data = cur.fetchone()
     if data is None:
-        cur.execute("""INSERT INTO users_data(userid, username) VALUES(?,?);""", message_user)
+        sql_command("""INSERT INTO users_data(userid, username) VALUES(?,?);""", message_user)
+        #cur.execute("""INSERT INTO users_data(userid, username) VALUES(?,?);""", message_user)
         today = date.today()
-        conn.commit()
+        #conn.commit()
         d = today.strftime('%Y-%m-%d')
-        cur.execute("""UPDATE users_data SET subscriber = ? WHERE userid = ?;""", (1, message_user[0]))
-        cur.execute("""UPDATE users_data SET time_subscribe = ? WHERE userid = ?;""", (d, message_user[0]))
-        cur.execute("""UPDATE users_data SET test_access = ? WHERE userid = ?;""", ('Yes', message_user[0]))
-        cur.execute("""UPDATE users_data SET percent = ? WHERE userid = ?;""", (0.1, message_user[0]))
-        conn.commit()
+        sql_command("""UPDATE users_data SET subscriber = ? WHERE userid = ?;""", (1, message_user[0]))
+        #cur.execute("""UPDATE users_data SET subscriber = ? WHERE userid = ?;""", (1, message_user[0]))
+        sql_command("""UPDATE users_data SET time_subscribe = ? WHERE userid = ?;""", (d, message_user[0]))
+        #cur.execute("""UPDATE users_data SET time_subscribe = ? WHERE userid = ?;""", (d, message_user[0]))
+        sql_command("""UPDATE users_data SET test_access = ? WHERE userid = ?;""", ('Yes', message_user[0]))
+        sql_command("""UPDATE users_data SET percent = ? WHERE userid = ?;""", (0.1, message_user[0]))
+        #conn.commit()
     await message.reply(
         "Привет!\n\nТут можно настроить бота\n\n"
         "Чтобы рассылка заработала нужно запустить этого бота: @BestLoopsBot\nПросто напиши ему /start",
@@ -109,11 +147,6 @@ async def process_subscribe_command(message: types.Message):
     await message.reply("Используйте биржу Binance\n\nПосле оплаты напишите @e_usovchan что Вы оплатили\nи в сообщении укажите Ваш ID:", reply=False)
     await message.reply(subscr_id, reply=False, reply_markup=main_kb)
 
-
-@dp.message_handler(lambda message: message.text == 'Не сегодня!', state=Cases.STATE_PAYMENT)
-async def process_subscribe_command(message: types.Message, state: FSMContext):
-    await message.reply("Ну ладно(", reply_markup=main_kb, reply=False)
-    await state.reset_state()
 
 @dp.message_handler(lambda message: message.text == 'Настройки ⚙')
 async def process_settings_command(message: types.Message):
