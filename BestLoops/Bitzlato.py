@@ -16,6 +16,7 @@ key = {"kty": "EC",
        "d": "iL8qdHXJ3nftqyWgWRBC5vgLSEJs_Rjt8VoBgsTJPSA"}
 
 
+
 def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC'):
     dt = datetime.datetime.now()
     ts = time.mktime(dt.timetuple())
