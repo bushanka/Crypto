@@ -9,7 +9,6 @@ from aiogram.dispatcher import FSMContext
 from states import Cases
 from datetime import date
 
-
 # Bot create
 bot = Bot(token='1971360278:AAEmqzP0fKTi2a_eaNcMMLn0386ouLuwIT0')
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -37,8 +36,8 @@ button_money_settings = KeyboardButton('Торговля')
 
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 main_kb.add(button_settings, button_subscribe)
-#main_kb.add(button_subscribe)
-#main_kb.add(button_help)
+# main_kb.add(button_subscribe)
+# main_kb.add(button_help)
 
 pay_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 pay_kb.add(button_pay)
@@ -57,6 +56,8 @@ sub_settings_kb.add(button_exchanges, button_money_settings, button_settings_exi
 
 
 def sql_command(command_text, params=None):
+    connection = False
+    data = None
     try:
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
@@ -68,12 +69,13 @@ def sql_command(command_text, params=None):
             data = cursor.fetchall()
         connection.commit()
         cursor.close()
-    except qlite3.Error as error:
+    except sqlite3.Error as error:
         print("Error while connecting to sqlite", error)
     finally:
-        if (connection):
+        if connection:
             connection.close()
     return data
+
 
 sql_command("""CREATE TABLE IF NOT EXISTS users_data(
 "userid" INT PRIMARY KEY,
@@ -89,45 +91,19 @@ sql_command("""CREATE TABLE IF NOT EXISTS users_data(
 "is_binance_eth" INTEGER DEFAULT 1,
 "is_binance_btc" INTEGER DEFAULT 1);""")
 
-#conn = sqlite3.connect('data.db')
-#cur = conn.cursor()
-
-#cur.execute("""CREATE TABLE IF NOT EXISTS users_data(
-#"userid" INT PRIMARY KEY,
-#"username" TEXT,
-#"subscriber" INTEGER DEFAULT 0,
-#"volume" TEXT DEFAULT 100000,
-#"payment_methods" TEXT DEFAULT 'Tinkoff',
-#"test_access" TEXT DEFAULT 'Yes',
-#"time_subscribe" TEXT,
-#"percent" REAL DEFAULT 0,
-#"min_amount" INTEGER DEFAULT 5000,
-#"is_binance_usdt" INTEGER DEFAULT 1,
-#"is_binance_eth" INTEGER DEFAULT 1,
-#"is_binance_btc" INTEGER DEFAULT 1);""")
-
-#conn.commit()
-#cur.close()
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     message_user = [message.chat.id, message.chat.username]
     data = sql_command("SELECT userid FROM users_data WHERE userid = ?;", params=(message_user[0],))
-    #cur.execute("SELECT userid FROM users_data WHERE userid = ?;", (message_user[0],))
-    #data = cur.fetchone()
     if data is None:
         sql_command("""INSERT INTO users_data(userid, username) VALUES(?,?);""", message_user)
-        #cur.execute("""INSERT INTO users_data(userid, username) VALUES(?,?);""", message_user)
         today = date.today()
-        #conn.commit()
         d = today.strftime('%Y-%m-%d')
         sql_command("""UPDATE users_data SET subscriber = ? WHERE userid = ?;""", (1, message_user[0]))
-        #cur.execute("""UPDATE users_data SET subscriber = ? WHERE userid = ?;""", (1, message_user[0]))
         sql_command("""UPDATE users_data SET time_subscribe = ? WHERE userid = ?;""", (d, message_user[0]))
-        #cur.execute("""UPDATE users_data SET time_subscribe = ? WHERE userid = ?;""", (d, message_user[0]))
         sql_command("""UPDATE users_data SET test_access = ? WHERE userid = ?;""", ('Yes', message_user[0]))
         sql_command("""UPDATE users_data SET percent = ? WHERE userid = ?;""", (0.1, message_user[0]))
-        #conn.commit()
     await message.reply(
         "Привет!\n\nТут можно настроить бота\n\n"
         "Чтобы рассылка заработала нужно запустить этого бота: @BestLoopsBot\nПросто напиши ему /start",
@@ -142,9 +118,14 @@ async def process_help_command(message: types.Message):
 @dp.message_handler(lambda message: message.text == 'Оплата подписки 💵')
 async def process_subscribe_command(message: types.Message):
     subscr_id = str(message.chat.id)
-    await message.reply("Чтобы продлить подписку на месяц, переведите 29 USDT на один из адресов:", reply_markup=main_kb, reply=False)
-    await message.reply("BSC(BEP20): 0x93f5e1069a1cd94c4166c5060b770563fbba12de\n\nTron(TRC20): TE8FdD1RWiBvMsEMdtk5FJwvDQBF2vt7Ai", reply=False)
-    await message.reply("Используйте биржу Binance\n\nПосле оплаты напишите @e_usovchan что Вы оплатили\nи в сообщении укажите Ваш ID:", reply=False)
+    await message.reply("Чтобы продлить подписку на месяц, переведите 29 USDT на один из адресов:",
+                        reply_markup=main_kb, reply=False)
+    await message.reply(
+        "BSC(BEP20): 0x93f5e1069a1cd94c4166c5060b770563fbba12de\n\nTron(TRC20): TE8FdD1RWiBvMsEMdtk5FJwvDQBF2vt7Ai",
+        reply=False)
+    await message.reply(
+        "Используйте биржу Binance\n\nПосле оплаты напишите @e_usovchan что Вы оплатили\nи в сообщении укажите Ваш ID:",
+        reply=False)
     await message.reply(subscr_id, reply=False, reply_markup=main_kb)
 
 
@@ -153,20 +134,24 @@ async def process_settings_command(message: types.Message):
     await message.reply("Здесь можно настроить бота", reply_markup=sub_settings_kb, reply=False)
     await Cases.SUB_STATE_SETTINGS.set()
 
+
 @dp.message_handler(lambda message: message.text == 'Биржи', state=Cases.SUB_STATE_SETTINGS)
 async def process_settings_command(message: types.Message):
     await message.reply("Настройка биржи", reply_markup=settings_kb_exch, reply=False)
     await Cases.STATE_EXCH_SETTINGS.set()
+
 
 @dp.message_handler(lambda message: message.text == 'Торговля', state=Cases.SUB_STATE_SETTINGS)
 async def process_settings_command(message: types.Message):
     await message.reply("Настройка торговли", reply_markup=settings_kb_trade, reply=False)
     await Cases.STATE_TRADE_SETTINGS.set()
 
+
 @dp.message_handler(lambda message: message.text == 'Назад', state=Cases.STATE_EXCH_SETTINGS)
 async def process_settings_command(message: types.Message):
     await message.reply("Готово", reply_markup=sub_settings_kb, reply=False)
     await Cases.SUB_STATE_SETTINGS.set()
+
 
 @dp.message_handler(lambda message: message.text == 'Назад', state=Cases.STATE_TRADE_SETTINGS)
 async def process_settings_command(message: types.Message):
@@ -181,21 +166,26 @@ async def settings(message: types.Message):
         reply_markup=main_kb, reply=False)
     await Cases.STATE_VOLUME.set()
 
+
 def exchange_settings_buttons(exch, mes):
-    cur.execute("""SELECT * from users_data WHERE userid = ?""", (mes.chat.id,))
-    rec_list = cur.fetchall()[0]
+    data = sql_command("""SELECT * from users_data WHERE userid = ?""", (mes.chat.id,))
+    rec_list = data[0]
     bin_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     if exch == 'Binance':
         if rec_list[10] == 1 and rec_list[11] == 1 and rec_list[12] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[10] == 1 and rec_list[11] == 1 and rec_list[12] == 0:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Включить BTC'))
         elif rec_list[10] == 1 and rec_list[11] == 0 and rec_list[12] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[10] == 1 and rec_list[11] == 0 and rec_list[12] == 0:
             bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[10] == 0 and rec_list[11] == 1 and rec_list[12] == 1:
-            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[10] == 0 and rec_list[11] == 1 and rec_list[12] == 0:
             bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[10] == 0 and rec_list[11] == 0 and rec_list[12] == 1:
@@ -204,15 +194,19 @@ def exchange_settings_buttons(exch, mes):
             bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Включить BTC'))
     if exch == 'Garantex':
         if rec_list[13] == 1 and rec_list[14] == 1 and rec_list[15] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[13] == 1 and rec_list[14] == 1 and rec_list[15] == 0:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Включить BTC'))
         elif rec_list[13] == 1 and rec_list[14] == 0 and rec_list[15] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[13] == 1 and rec_list[14] == 0 and rec_list[15] == 0:
             bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[13] == 0 and rec_list[14] == 1 and rec_list[15] == 1:
-            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[13] == 0 and rec_list[14] == 1 and rec_list[15] == 0:
             bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[13] == 0 and rec_list[14] == 0 and rec_list[15] == 1:
@@ -221,15 +215,19 @@ def exchange_settings_buttons(exch, mes):
             bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Включить BTC'))
     if exch == 'Bitzlato':
         if rec_list[16] == 1 and rec_list[17] == 1 and rec_list[18] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[16] == 1 and rec_list[17] == 1 and rec_list[18] == 0:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Включить BTC'))
         elif rec_list[16] == 1 and rec_list[17] == 0 and rec_list[18] == 1:
-            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[16] == 1 and rec_list[17] == 0 and rec_list[18] == 0:
             bin_kb.add(KeyboardButton('Выключить USDT'), KeyboardButton('Включить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[16] == 0 and rec_list[17] == 1 and rec_list[18] == 1:
-            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Выключить BTC'))
+            bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'),
+                       KeyboardButton('Выключить BTC'))
         elif rec_list[16] == 0 and rec_list[17] == 1 and rec_list[18] == 0:
             bin_kb.add(KeyboardButton('Включить USDT'), KeyboardButton('Выключить ETH'), KeyboardButton('Включить BTC'))
         elif rec_list[16] == 0 and rec_list[17] == 0 and rec_list[18] == 1:
@@ -239,11 +237,13 @@ def exchange_settings_buttons(exch, mes):
     bin_kb.add(KeyboardButton('Назад'))
     return bin_kb
 
+
 @dp.message_handler(lambda message: message.text == 'Настроить Binance', state=Cases.STATE_EXCH_SETTINGS)
 async def settings(message: types.Message):
     bin_kb = exchange_settings_buttons('Binance', mes=message)
     await message.reply("Выберите какие монеты включить/выключить для отображения", reply_markup=bin_kb, reply=False)
     await Cases.STATE_CHANGE_BINANCE_COIN_SETTINGS.set()
+
 
 @dp.message_handler(lambda message: message.text == 'Настроить Garantex', state=Cases.STATE_EXCH_SETTINGS)
 async def settings(message: types.Message):
@@ -261,7 +261,6 @@ async def settings(message: types.Message):
     await Cases.STATE_CHANGE_BITZLATO_COIN_SETTINGS.set()
 
 
-
 @dp.message_handler(lambda message: message.text == 'Методы оплаты', state=Cases.STATE_TRADE_SETTINGS)
 async def settings(message: types.Message):
     await message.reply(
@@ -273,33 +272,27 @@ async def settings(message: types.Message):
 @dp.message_handler(state=Cases.STATE_CHANGE_BINANCE_COIN_SETTINGS)
 async def settings(message: types.Message):
     if message.text == 'Выключить USDT':
-        cur.execute("""UPDATE users_data SET is_binance_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить ETH':
-        cur.execute("""UPDATE users_data SET is_binance_eth = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_eth = ? WHERE userid = ?;""", (0, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить BTC':
-        cur.execute("""UPDATE users_data SET is_binance_btc = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_btc = ? WHERE userid = ?;""", (0, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить USDT':
-        cur.execute("""UPDATE users_data SET is_binance_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить ETH':
-        cur.execute("""UPDATE users_data SET is_binance_eth = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_eth = ? WHERE userid = ?;""", (1, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить BTC':
-        cur.execute("""UPDATE users_data SET is_binance_btc = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_binance_btc = ? WHERE userid = ?;""", (1, message.chat.id))
         bin_kb = exchange_settings_buttons('Binance', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Назад':
@@ -308,36 +301,36 @@ async def settings(message: types.Message):
     else:
         await message.reply("Используйте кнопки, поробуйте еще раз", reply=False, reply_markup=settings_kb_exch)
 
+
 @dp.message_handler(state=Cases.STATE_CHANGE_GARANTEX_COIN_SETTINGS)
 async def settings(message: types.Message):
     if message.text == 'Выключить USDT':
-        cur.execute("""UPDATE users_data SET is_garantex_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить ETH':
-        cur.execute("""UPDATE users_data SET is_garantex_eth = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_eth = ? WHERE userid = ?;""", (0, message.chat.id))
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить BTC':
-        cur.execute("""UPDATE users_data SET is_garantex_btc = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_btc = ? WHERE userid = ?;""", (0, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить USDT':
-        cur.execute("""UPDATE users_data SET is_garantex_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить ETH':
-        cur.execute("""UPDATE users_data SET is_garantex_eth = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_eth = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить BTC':
-        cur.execute("""UPDATE users_data SET is_garantex_btc = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_garantex_btc = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Garantex', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Назад':
@@ -350,33 +343,33 @@ async def settings(message: types.Message):
 @dp.message_handler(state=Cases.STATE_CHANGE_BITZLATO_COIN_SETTINGS)
 async def settings(message: types.Message):
     if message.text == 'Выключить USDT':
-        cur.execute("""UPDATE users_data SET is_bz_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_usdt = ? WHERE userid = ?;""", (0, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить ETH':
-        cur.execute("""UPDATE users_data SET is_bz_eth = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_eth = ? WHERE userid = ?;""", (0, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Выключить BTC':
-        cur.execute("""UPDATE users_data SET is_bz_btc = ? WHERE userid = ?;""", (0, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_btc = ? WHERE userid = ?;""", (0, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить USDT':
-        cur.execute("""UPDATE users_data SET is_bz_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_usdt = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить ETH':
-        cur.execute("""UPDATE users_data SET is_bz_eth = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_eth = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Включить BTC':
-        cur.execute("""UPDATE users_data SET is_bz_btc = ? WHERE userid = ?;""", (1, message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET is_bz_btc = ? WHERE userid = ?;""", (1, message.chat.id))
+
         bin_kb = exchange_settings_buttons('Bitzlato', mes=message)
         await message.reply("Изменено", reply=False, reply_markup=bin_kb)
     elif message.text == 'Назад':
@@ -396,9 +389,10 @@ async def settings(message: types.Message, state: FSMContext):
 async def settings(message: types.Message):
     volume_text = message.text
     if volume_text.isdigit():
-        cur.execute("""UPDATE users_data SET volume = ? WHERE userid = ?;""", (volume_text, message.chat.id))
-        conn.commit()
-        await message.reply("Теперь ваш объем: {:,} ₽".format(int(volume_text)), reply_markup=settings_kb_trade, reply=False)
+        sql_command("""UPDATE users_data SET volume = ? WHERE userid = ?;""", (volume_text, message.chat.id))
+
+        await message.reply("Теперь ваш объем: {:,} ₽".format(int(volume_text)), reply_markup=settings_kb_trade,
+                            reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
     else:
         await message.reply("Ошибка ввода, попробуйте еще раз", reply_markup=sub_settings_kb, reply=False)
@@ -408,25 +402,24 @@ async def settings(message: types.Message):
 async def settings(message: types.Message):
     method_text = message.text
     if method_text == 'Тинькофф':
-        cur.execute("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""", ('Tinkoff', message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""", ('Tinkoff', message.chat.id))
+
         await message.reply(f"Ваши методы оплаты: {method_text}", reply_markup=settings_kb_trade, reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
     elif method_text == 'Сбербанк':
-        cur.execute("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""", ('Sberbank', message.chat.id))
-        conn.commit()
+        sql_command("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""", ('Sberbank', message.chat.id))
+
         await message.reply(f"Ваши методы оплаты: {method_text}", reply_markup=settings_kb_trade, reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
     elif method_text == 'Тинькофф или Сбербанк':
-        cur.execute("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""",
+        sql_command("""UPDATE users_data SET payment_methods = ? WHERE userid = ?;""",
                     ('Tinkoff,Sberbank', message.chat.id))
-        conn.commit()
+
         await message.reply(f"Ваши методы оплаты: {method_text}", reply_markup=settings_kb_trade, reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
     else:
         await message.reply("Такие методы пока не поддерживаются, выберите, пожалуйста, другие",
                             reply_markup=pay_methods_kb, reply=False)
-
 
 
 @dp.message_handler(lambda message: message.text == 'Процент', state=Cases.STATE_TRADE_SETTINGS)
@@ -448,22 +441,24 @@ async def settings(message: types.Message):
 @dp.message_handler(state=Cases.STATE_PERCENT)
 async def settings(message: types.Message):
     percent_text = message.text
-    if percent_text.replace('.','',1).replace('-','',1).isdigit():
-        cur.execute("""UPDATE users_data SET percent = ? WHERE userid = ?;""", (float(percent_text), message.chat.id))
-        conn.commit()
+    if percent_text.replace('.', '', 1).replace('-', '', 1).isdigit():
+        sql_command("""UPDATE users_data SET percent = ? WHERE userid = ?;""", (float(percent_text), message.chat.id))
         await message.reply("Ваш процент: {}".format(percent_text), reply_markup=settings_kb_trade, reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
 
     else:
         await message.reply('Ошибка ввода, попробуйте еще раз')
 
+
 @dp.message_handler(state=Cases.STATE_MIN_AMOUNT)
 async def settings(message: types.Message):
     percent_text = message.text
     if percent_text.isdigit():
-        cur.execute("""UPDATE users_data SET min_amount = ? WHERE userid = ?;""", (float(percent_text), message.chat.id))
-        conn.commit()
-        await message.reply("Нижний лимит: {:,} ₽".format(int(percent_text)), reply_markup=settings_kb_trade, reply=False)
+        sql_command("""UPDATE users_data SET min_amount = ? WHERE userid = ?;""",
+                    (float(percent_text), message.chat.id))
+
+        await message.reply("Нижний лимит: {:,} ₽".format(int(percent_text)), reply_markup=settings_kb_trade,
+                            reply=False)
         await Cases.STATE_TRADE_SETTINGS.set()
 
     else:
