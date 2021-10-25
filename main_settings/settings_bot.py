@@ -598,7 +598,5 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
 
-# TODO  Поменять в bot_sender способ обработки методов оплаты
-
 if __name__ == '__main__':
     executor.start_polling(dp)
