@@ -268,7 +268,8 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == 'button_settings_bin_gar' or c.data == 'button_back_bingar')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.edit_message_text(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id,
-                                text="Настройка Binance-Garantex-Bitzlato", reply_markup=inline_binance_garantex_settings_kb)
+                                text="Настройка Binance-Garantex-Bitzlato",
+                                reply_markup=inline_binance_garantex_settings_kb)
     await bot.answer_callback_query(callback_query.id)
 
 
@@ -584,7 +585,8 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     inline_exchange_bingar_kb.add(inline_button_back_bingar)
 
     await bot.edit_message_text(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id,
-                                text="Настроить Bitzlato\n\nВключенные валюты помечены ✔. \n\nВыключенные ❌. \n\nНажмите чтобы изменить",
+                                text="Настроить Bitzlato\n\nВключенные валюты помечены ✔. "
+                                     "\n\nВыключенные ❌. \n\nНажмите чтобы изменить",
                                 reply_markup=inline_exchange_bingar_kb)
     await bot.answer_callback_query(callback_query.id)
 

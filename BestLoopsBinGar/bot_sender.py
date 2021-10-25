@@ -11,7 +11,8 @@ from main import parse_all_info
 import os
 
 path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'main_data.db')
-path_settings_binance_garantex_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'settings_binance_garantex.db')
+path_settings_binance_garantex_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings',
+                                                 'settings_binance_garantex.db')
 
 TOKEN = '1913516507:AAG7oDMX5EuIHo9FPwLhpx5bI6Bcja3Anx0'
 CHAT_ID = -544855288
@@ -20,7 +21,6 @@ CHAT_ID = -544855288
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
-
 
 
 def sql_command(command_text, data_base_name='main_data.db', params=None):
@@ -68,7 +68,7 @@ async def send_info(user_id, texts_list_bin_gar, texts_list_gar_bin, texts_list_
 async def start():
     while True:
         b, g, bz = parse_all_info()
-        is_user_sub = sql_command("""SELECT subscriber_binance_garantex from main_users_data""",path_main_db )
+        is_user_sub = sql_command("""SELECT subscriber_binance_garantex from main_users_data""", path_main_db)
         records_list = sql_command("""SELECT * from settings_binance_garantex""", path_settings_binance_garantex_db)
         for iterate, user in enumerate(records_list):
             if is_user_sub[iterate][0] == 1:
