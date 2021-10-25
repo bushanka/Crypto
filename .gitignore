@@ -1,3 +1,4 @@
-/BestChange_Binance_bot/bch_api.zip
-/BestChange_Binance_bot/bch_files
-/BestLoops/data.db
+/main_settings/*.db
+/BestLoopsBchBin/bch_files
+/BestLoopsBchBin/bch_api.zip
+/BestLoopsBinGar/token.txt
