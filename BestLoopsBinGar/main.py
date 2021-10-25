@@ -82,7 +82,7 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
     coins = ['btc', 'eth', 'usdt']
 
     for num, c in enumerate(coins):
-        for pay_met in payment_method.split(','):
+        for pay_met, is_pay_meth in payment_method.items():
             # Binance -> Garantex
             try:
                 sell_price_on_gar = float(parsed_gar[c]['asks'][0]['price'])  # Здесь краш если код не перегенирирован
@@ -100,7 +100,7 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
             profit = ((volume / (buy_price_on_binance_p2p * 1.001) - fee_transfer(
                 c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
 
-            if profit > percent and ((is_binance_usdt == 1 and c=='usdt') or (is_binance_eth == 1 and c=='eth') or (is_binance_btc and c=='btc')) :
+            if profit > percent and is_pay_meth and ((is_binance_usdt == 1 and c=='usdt') or (is_binance_eth == 1 and c=='eth') or (is_binance_btc and c=='btc')) :
                 send_to_user_info_on_bin_gar.append(
                     f'{c.upper()}\n\n' + 'Цена Binance P2P ' + pay_met +
                     ': \n{:,} ₽\n\n'.format(
@@ -119,7 +119,7 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
                     break
             profit = ((volume / (buy_price_on_gar * 1.0015) - fee_transfer(
                 c)) * sell_price_on_binance_p2p * 0.999 - volume) / volume * 100
-            if profit > percent and ((is_gar_usdt == 1 and c=='usdt') or (is_gar_eth == 1 and c=='eth') or (is_gar_btc and c=='btc')):
+            if profit > percent and is_pay_meth and ((is_gar_usdt == 1 and c=='usdt') or (is_gar_eth == 1 and c=='eth') or (is_gar_btc and c=='btc')):
                 send_to_user_info_on_gar_bin.append(f'{c.upper()}\n\n' +
                                                     'Цена Garantex: \n{:,} ₽\n\n'.format(buy_price_on_gar) +
                                                     'Цена Binance P2P ' + pay_met + ': \n{:,} ₽'.format(
@@ -144,7 +144,7 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
                     break
             profit = ((volume / (buy_price_on_bz * 1.005) - fee_transfer_bz(
                 c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
-            if profit > percent and  ((is_bz_usdt == 1 and c=='usdt') or (is_bz_eth == 1 and c=='eth') or (is_bz_btc and c=='btc')):
+            if profit > percent and is_pay_meth and ((is_bz_usdt == 1 and c=='usdt') or (is_bz_eth == 1 and c=='eth') or (is_bz_btc and c=='btc')):
                 send_to_user_info_on_bz_gar.append(f'{c.upper()}\n\n' +
                                                    'Цена Bitzlato ' + pay_met + ': \n{:,} ₽\n\n'.format(
                     buy_price_on_bz) +
