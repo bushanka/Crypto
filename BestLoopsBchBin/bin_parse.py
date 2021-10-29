@@ -5,7 +5,7 @@ api_secret = '27EQ7gSL8EskW338q5uh0Wk3DibCp5ZceLsfzTR2Gp803gLAaANz3Pb5ouPQLz0F'
 
 client = Client(api_key, api_secret)
 ALL_COIN_NAMES = [cur['coin'] for cur in client.get_all_coins_info()] + ["RUB"]
-
+ALL_COIN_NAMES_D = {cur['coin']: 0 for cur in client.get_all_coins_info()}
 
 def legacy_find_all_pairs(ticker, all_tickers):  # TODO не использовать больше эту функцию
     ans = []
@@ -43,7 +43,7 @@ def find_all_pairs_bc(coin, tickers):
     return result
 
 # TODO не находит то что видит версия 2
-def split_ticker(ticker_symbol):
+def split_ticker_legacy(ticker_symbol):
     for i in range(len(ticker_symbol)):
         s1 = ticker_symbol[0:len(ticker_symbol) // 2 + i * (-1) ** (i + 1)]
         s2 = ticker_symbol[len(ticker_symbol) // 2 + i * (-1) ** (i + 1)::]
@@ -51,9 +51,22 @@ def split_ticker(ticker_symbol):
             return s1, s2
     return None, None
 
+def split_ticker(ticker_symbol):
+    for i in range(len(ticker_symbol)):
+        # s1 = ticker_symbol[0:len(ticker_symbol) // 2 + i%2 * (-1) ** (i + 1)]
+        # s2 = ticker_symbol[len(ticker_symbol) // 2 + (i+1)%2 * (-1) ** (i + 1)::]
+        s1 = ticker_symbol[0:2+i]
+        s2 = ticker_symbol[2+i::]
+        try:
+            ALL_COIN_NAMES_D[s1]
+            ALL_COIN_NAMES_D[s2]
+            return s1, s2
+        except:
+            pass
+    return None, None
 
 # Медленнее чем версия 1, но находит все пары
-def split_ticker_2(ticker_symbol):
+def split_ticker_2_legacy(ticker_symbol):
     for i in range(len(ticker_symbol)):
         s1 = ticker_symbol[0:2 + i]
         s2 = ticker_symbol[i + 2::]
@@ -63,7 +76,8 @@ def split_ticker_2(ticker_symbol):
 
 
 if __name__ == '__main__':
-    pass
+    t = 'BTCETH'
+    print(split_ticker_(t), split_ticker(t))
     # import re
     # from best_change_parser import read_data
     #

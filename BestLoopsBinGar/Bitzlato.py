@@ -8,12 +8,19 @@ import json
 import pprint
 
 # secret user key
-key = {"kty": "EC",
-       "alg": "ES256",
-       "crv": "P-256",
-       "x": "AZdaliLhQR9j2gYwvrvM12QekaM4q1sAy6uzw4NpBW0",
-       "y": "uWvlqax96hXgeq6ZrePX18aJ2Y3eAIa0o6jA_6ySFts",
-       "d": "iL8qdHXJ3nftqyWgWRBC5vgLSEJs_Rjt8VoBgsTJPSA"}
+#key = {"kty": "EC",
+      # "alg": "ES256",
+      # "crv": "P-256",
+      # "x": "AZdaliLhQR9j2gYwvrvM12QekaM4q1sAy6uzw4NpBW0",
+      # "y": "uWvlqax96hXgeq6ZrePX18aJ2Y3eAIa0o6jA_6ySFts",
+      # "d": "iL8qdHXJ3nftqyWgWRBC5vgLSEJs_Rjt8VoBgsTJPSA"}
+
+key = {"kty":"EC",
+       "alg":"ES256",
+       "crv":"P-256",
+       "x":"LFHAvdKvGTFxn2E08XgvRxD0JcUlnlfQ9JqVbQ9ItDM",
+       "y":"XXVRiMbD-xkol7BCLzKN1ep_N_MA1HvX2SOHZOv8vsE",
+       "d":"Ghot1REzM8ZX1S9JDNmK69u7cyzW3pZ_Fx5PP1cFxWo"}
 
 
 
@@ -31,7 +38,7 @@ def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC')
         "jti": hex(random.getrandbits(64))
     }
     # make token with claims from secret user key
-    token = jws.sign(claims, key, headers={"kid": "1"}, algorithm=ALGORITHMS.ES256)
+    token = jws.sign(claims, key, headers={"kid": "2"}, algorithm=ALGORITHMS.ES256)
 
     currency = 'RUB'
 
@@ -54,6 +61,7 @@ def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC')
                          "limit": 20,
                          "paymethod": f'{pay_method_id}'
                      })
+#    print(r.text)
     return json.loads(r.text)
 
 
