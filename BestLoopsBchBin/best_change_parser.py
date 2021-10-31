@@ -31,13 +31,18 @@ def extract_dat(dat_path):
 
 def read_data():
     """Запуск всех функций с нужными path'ами, возвращаем что-то типа json"""
-
+#    import time
     save_path = 'bch_api.zip'
     url = 'http://api.bestchange.ru/info.zip'
     target_directory = 'bch_files'
-
+    
+ #   start_time = time.time()
     download_url(url, save_path)
+  #  print(f'time to download: {-start_time + time.time()}')
+    
+   # start_time = time.time()
     extract_zip(save_path, target_directory)
+    #print(f'time to extract: {time.time() - start_time}')  
 
     list_currencies = extract_dat('bch_files/bm_cy.dat')
     list_exch = extract_dat('bch_files/bm_exch.dat')
@@ -67,7 +72,7 @@ def read_data():
 if __name__ == '__main__':
     r = read_data()
     # print(c, e, sep='\n')
-    print(len(r))
-    for r_i in r:
-        if r_i['id_currency_give_away'] == 'QIWI RUB':
-            print(r_i)
+   # print(len(r))
+#    for r_i in r:
+ #       if r_i['id_currency_give_away'] == 'QIWI RUB':
+  #          print(r_i)
