@@ -128,31 +128,32 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
                     (volume / (buy_price_on_gar * 1.0015) - fee_transfer(
                         c)) * sell_price_on_binance_p2p * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
             # Bitzlato -> Garantex
-            try:
-                buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
-            except:
-                parsed_bz = re_parse_bz()
-                buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
-            sell_price_on_gar = float(parsed_gar[c]['asks'][0]['price'])
-            # print(parsed_bz[pay_met][num][c][0]['data'])
+            if parsed_bz is not None:
+                try:
+                    buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
+                except:
+                    parsed_bz = re_parse_bz()
+                    buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
+                sell_price_on_gar = float(parsed_gar[c]['asks'][0]['price'])
+                # print(parsed_bz[pay_met][num][c][0]['data'])
 
-            for seller in parsed_bz[pay_met][num][c][0]['data']:
-                # print(float(seller['rate']))
-                if float(seller['limitCurrency']['min']) <= min_amount:
-                    buy_price_on_bz = float(seller['rate'])
-                    # print('!!!!', buy_price_on_bz)
-                    break
-            profit = ((volume / (buy_price_on_bz * 1.005) - fee_transfer_bz(
-                c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
-            if profit > percent and is_pay_meth and ((is_bz_usdt == 1 and c=='usdt') or (is_bz_eth == 1 and c=='eth') or (is_bz_btc and c=='btc')):
-                send_to_user_info_on_bz_gar.append(f'{c.upper()}\n\n' +
-                                                   'Цена Bitzlato ' + pay_met + ': \n{:,} ₽\n\n'.format(
-                    buy_price_on_bz) +
-                                                   'Цена Garantex: \n{:,} ₽'.format(
-                                                       sell_price_on_gar) + '\n\nВаш нижний лимит: {:,} ₽\n\n'.format(
-                    min_amount) + 'Прибыль: {:,.3f} ₽\n\n'.format(
-                    (volume / (buy_price_on_bz * 1.005) - fee_transfer_bz(
-                        c)) * sell_price_on_gar * 0.9985 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
+                for seller in parsed_bz[pay_met][num][c][0]['data']:
+                    # print(float(seller['rate']))
+                    if float(seller['limitCurrency']['min']) <= min_amount:
+                        buy_price_on_bz = float(seller['rate'])
+                        # print('!!!!', buy_price_on_bz)
+                        break
+                profit = ((volume / (buy_price_on_bz * 1.005) - fee_transfer_bz(
+                    c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
+                if profit > percent and is_pay_meth and ((is_bz_usdt == 1 and c=='usdt') or (is_bz_eth == 1 and c=='eth') or (is_bz_btc and c=='btc')):
+                    send_to_user_info_on_bz_gar.append(f'{c.upper()}\n\n' +
+                                                       'Цена Bitzlato ' + pay_met + ': \n{:,} ₽\n\n'.format(
+                        buy_price_on_bz) +
+                                                       'Цена Garantex: \n{:,} ₽'.format(
+                                                           sell_price_on_gar) + '\n\nВаш нижний лимит: {:,} ₽\n\n'.format(
+                        min_amount) + 'Прибыль: {:,.3f} ₽\n\n'.format(
+                        (volume / (buy_price_on_bz * 1.005) - fee_transfer_bz(
+                            c)) * sell_price_on_gar * 0.9985 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
 
     return send_to_user_info_on_bin_gar, send_to_user_info_on_gar_bin, send_to_user_info_on_bz_gar
 
