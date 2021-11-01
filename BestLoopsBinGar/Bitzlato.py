@@ -6,7 +6,7 @@ from jose import jws
 from jose.constants import ALGORITHMS
 import json
 import pprint
-
+from json.decoder import JSONDecodeError
 # secret user key
 #key = {"kty": "EC",
       # "alg": "ES256",
@@ -25,6 +25,7 @@ key = {"kty":"EC",
 
 
 def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC'):
+    ans = None
     dt = datetime.datetime.now()
     ts = time.mktime(dt.timetuple())
     claims = {
@@ -61,8 +62,13 @@ def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC')
                          "limit": 20,
                          "paymethod": f'{pay_method_id}'
                      })
-#    print(r.text)
-    return json.loads(r.text)
+#    print(r.text)   
+    try:
+        ans = json.loads(r.text)
+    except JSONDecodeError:
+        pass
+        #print("Vilet s pozorom ", JSONDecodeError.msg)
+    return ans
 
 
 if __name__ == '__main__':
