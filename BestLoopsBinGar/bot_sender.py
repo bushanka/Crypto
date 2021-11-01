@@ -70,7 +70,10 @@ async def start():
         b, g, bz = parse_all_info()
         is_user_sub = sql_command("""SELECT subscriber_binance_garantex from main_users_data""", path_main_db)
         records_list = sql_command("""SELECT * from settings_binance_garantex""", path_settings_binance_garantex_db)
+     #   print(records_list)
+      #  print(is_user_sub)
         for iterate, user in enumerate(records_list):
+       #     print(iterate)
             if is_user_sub[iterate][0] == 1:
                 bin_gar_info, gar_bin_info, bz_gar_info = filter_param(volume=float(user[2]),
                                                                        payment_method={'Tinkoff': user[3],

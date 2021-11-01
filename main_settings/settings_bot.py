@@ -83,6 +83,9 @@ inline_button_bingar_bz_usdt_yes = InlineKeyboardButton('USDT ✔', callback_dat
 inline_button_bingar_bz_btc_no = InlineKeyboardButton('BTC ❌', callback_data='button_bingar_bz_btc_no')
 inline_button_bingar_bz_btc_yes = InlineKeyboardButton('BTC ✔', callback_data='button_bingar_bz_btc_yes')
 
+inline_button_bchbin_percent = InlineKeyboardButton('Процент', callback_data='button_bchbin_percent')
+inline_button_beschange_binance_kb = InlineKeyboardMarkup().add(inline_button_bchbin_percent, inline_btn_back_main)
+
 inline_button_exchange_kb = InlineKeyboardMarkup().add(inline_button_binance_settings, inline_button_garantex_settings,
                                                        inline_button_bitzlato_settings, inline_button_back_bingar)
 
@@ -273,6 +276,14 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
 
 
+@dp.callback_query_handler(lambda c: c.data == 'button_settings_bch_gin')
+async def process_callback_button1(callback_query: types.CallbackQuery):
+    await bot.edit_message_text(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id,
+                                text="Настройка BestChange-Binance",
+                                reply_markup=inline_button_beschange_binance_kb)
+    await bot.answer_callback_query(callback_query.id)
+
+
 @dp.callback_query_handler(lambda c: c.data == 'button_trade_settings')
 async def process_callback_button1(callback_query: types.CallbackQuery):
     await bot.edit_message_text(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id,
@@ -331,6 +342,28 @@ async def process_callback_button1(callback_query: types.CallbackQuery):
                                 "без других знкаов (Пример: 0.7)")
     await bot.answer_callback_query(callback_query.id)
     await Cases.STATE_PERCENT_BIN_GAR.set()
+
+
+@dp.callback_query_handler(lambda c: c.data == 'button_bchbin_percent')
+async def process_callback_button1(callback_query: types.CallbackQuery):
+    await bot.send_message(chat_id=callback_query.from_user.id,
+                           text="При каком проценте присылать уведомления о спреде?\n\nНапишите число через точку "
+                                "без других знкаов (Пример: 0.7)")
+    await bot.answer_callback_query(callback_query.id)
+    await Cases.STATE_PERCENT_BCH_BIN.set()
+
+
+@dp.message_handler(state=Cases.STATE_PERCENT_BCH_BIN)
+async def settings(message: types.Message, state: FSMContext):
+    percent_text = message.text
+    if percent_text.replace('.', '', 1).replace('-', '', 1).isdigit():
+        sql_command("""UPDATE settings_bestchange_binance SET percent = ? WHERE userid = ?;""",
+                    params=(percent_text, message.chat.id), data_base_name='settings_bestchange_binance.db')
+        await message.reply("Ваш процент: {} %".format(percent_text), reply_markup=inline_main_kb,
+                            reply=False)
+        await state.reset_state()
+    else:
+        await message.reply('Ошибка ввода, попробуйте еще раз')
 
 
 @dp.message_handler(state=Cases.STATE_PERCENT_BIN_GAR)

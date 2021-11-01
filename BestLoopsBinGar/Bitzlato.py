@@ -7,14 +7,21 @@ from jose.constants import ALGORITHMS
 import json
 import pprint
 from json.decoder import JSONDecodeError
-
 # secret user key
-key = {"kty": "EC",
-       "alg": "ES256",
-       "crv": "P-256",
-       "x": "LFHAvdKvGTFxn2E08XgvRxD0JcUlnlfQ9JqVbQ9ItDM",
-       "y": "XXVRiMbD-xkol7BCLzKN1ep_N_MA1HvX2SOHZOv8vsE",
-       "d": "Ghot1REzM8ZX1S9JDNmK69u7cyzW3pZ_Fx5PP1cFxWo"}
+#key = {"kty": "EC",
+      # "alg": "ES256",
+      # "crv": "P-256",
+      # "x": "AZdaliLhQR9j2gYwvrvM12QekaM4q1sAy6uzw4NpBW0",
+      # "y": "uWvlqax96hXgeq6ZrePX18aJ2Y3eAIa0o6jA_6ySFts",
+      # "d": "iL8qdHXJ3nftqyWgWRBC5vgLSEJs_Rjt8VoBgsTJPSA"}
+
+key = {"kty":"EC",
+       "alg":"ES256",
+       "crv":"P-256",
+       "x":"LFHAvdKvGTFxn2E08XgvRxD0JcUlnlfQ9JqVbQ9ItDM",
+       "y":"XXVRiMbD-xkol7BCLzKN1ep_N_MA1HvX2SOHZOv8vsE",
+       "d":"Ghot1REzM8ZX1S9JDNmK69u7cyzW3pZ_Fx5PP1cFxWo"}
+
 
 
 def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC'):
@@ -50,20 +57,20 @@ def parse_bz(pay_method='Sberbank', order_type='purchase', cryptocurrency='BTC')
                          "cryptocurrency": f'{cryptocurrency}',
                          "currency": f"{currency}",
                          "type": f"{order_type}",  # purchase, selling
-                         # "isOwnerActive": True,
-                         # "isOwnerVerificated": True,
+                        # "isOwnerActive": True,
+                        # "isOwnerVerificated": True,
                          "limit": 20,
                          "paymethod": f'{pay_method_id}'
                      })
+#    print(r.text)   
     try:
         ans = json.loads(r.text)
     except JSONDecodeError:
-        print("Vilet s pozorom ", JSONDecodeError.msg)
+        pass
+        #print("Vilet s pozorom ", JSONDecodeError.msg)
     return ans
 
 
 if __name__ == '__main__':
-    while True:
-        a = parse_bz()
-        # pprint.pprint(a['data'])
-        time.sleep(10)
+    a = parse_bz()
+    pprint.pprint(a['data'])
