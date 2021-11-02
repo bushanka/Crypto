@@ -186,7 +186,6 @@ def parse_all_from_bch():
     bch = read_data()
     all_a_level = []
     all_b_level = []
-    coro = []
     for point in init_points.items():
         msg = start_parse_bch(point[0], point[1], BCH_DATA=bch, ALL_TICKERS=all_tick)
         all_a_level += msg[0]
@@ -196,16 +195,7 @@ def parse_all_from_bch():
 
 if __name__ == '__main__':
     import time
-
-    one = start_parse_bch()
-
-    start_time = time.time()
-    ans = filter_params(-1, one[0], one[1])
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    for a in ans[0]:
-        print(a)
-    print('A SCHEME END')
-    print()
-    for b in ans[1]:
-        print(b)
+    t1 = time.time()
+    a = parse_all_from_bch()
+    print(time.time() - t1)
+    print(filter_params(0, a_level=a[0], b_level=a[1]))
