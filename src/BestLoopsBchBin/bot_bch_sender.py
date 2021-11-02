@@ -24,17 +24,17 @@ bot_qiwi = Bot(token=TOKEN_QIWI)
 bot_cards = Bot(token=TOKEN_Cards)
 bot_nocards = Bot(token=TOKEN_NoCards)
 bot = Bot(token=TOKEN)
-path_main_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business', 'Crypto_bot', 'Crypto', 'src',
-                            'main_settings', 'main_data.db')
-path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business',
-                                                   'Crypto_bot',
-                                                   'Crypto', 'src',
-                                                   'main_settings', 'settings_bestchange_binance.db')
+# path_main_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business', 'Crypto_bot', 'Crypto', 'src',
+#                             'main_settings', 'main_data.db')
+# path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business',
+#                                                    'Crypto_bot',
+#                                                    'Crypto', 'src',
+#                                                    'main_settings', 'settings_bestchange_binance.db')
 
 
-# path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'main_data.db')
-# path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings',
-#                                                    'settings_bestchange_binance.db')
+path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'main_data.db')
+path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings',
+                                                   'settings_bestchange_binance.db')
 
 
 def sql_command(command_text, data_base_name='main_data.db', params=None):
@@ -75,7 +75,7 @@ async def send_info_legacy(msg):
 
 
 async def send_info(user_id, msg):
-    user_id = 383367365
+    #user_id = 383367365
     for mes in msg[0][:5]:
         if mes['Paymethod'] == 0:  # QIWI
             try:
@@ -111,21 +111,17 @@ async def send_info(user_id, msg):
 
 
 async def start():
-    import time
     while True:
         is_user_sub = sql_command("""SELECT subscriber_bestchange_binance from main_users_data""", path_main_db)
         records_list = sql_command("""SELECT * from settings_bestchange_binance""", path_settings_bestchange_binance_db)
 
-        t1 = time.time()
-        print('here')
         text = parse_all_from_bch()
-        print(time.time() - t1)
-        # await send_info_legacy(msg=filter_params(0.4, text[0], text[1]))
+        await send_info_legacy(msg=filter_params(0.4, text[0], text[1]))
 
         coros_1 = []
-        for iterate, user in enumerate(records_list[0:1]):
+        for iterate, user in enumerate(records_list):
             if is_user_sub[iterate][0] == 1:
-                coros_1.append(send_info(user_id=user[0], msg=filter_params(-1, text[0], text[1])))  # user[2]
+                coros_1.append(send_info(user_id=user[0], msg=filter_params(user[2], text[0], text[1])))  # user[2]
 
         await asyncio.gather(*coros_1)
 
