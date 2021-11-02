@@ -1,4 +1,4 @@
-/main_settings/*.h2.db
-/BestLoopsBchBin/bch_files
-/BestLoopsBchBin/bch_api.zip
-/BestLoopsBinGar/token.txt
+src/main_settings/*.h2.db
+src/BestLoopsBchBin/bch_files
+src/BestLoopsBchBin/bch_api.zip
+src/BestLoopsBinGar/token.txt

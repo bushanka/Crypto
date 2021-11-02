@@ -1,18 +1,19 @@
 import requests
 import zipfile
 import pandas as pd
-#import time
+
 
 def download_url(url_download, save_path_zip, chunk_size=128):
     """"Загрузка файла для парса"""
- #   start_time = time.time()
+    #   start_time = time.time()
 
     req = requests.get(url_download, stream=True)
     with open(save_path_zip, 'wb') as fd:
         for chunk in req.iter_content(chunk_size=chunk_size):
             fd.write(chunk)
-  #  print("--- %s seconds to download BCH_FILE ---" % (time.time() - start_time))
 
+
+#  print("--- %s seconds to download BCH_FILE ---" % (time.time() - start_time))
 
 
 def extract_zip(file_path, target_dir):
@@ -31,18 +32,18 @@ def extract_dat(dat_path):
 
 def read_data():
     """Запуск всех функций с нужными path'ами, возвращаем что-то типа json"""
-#    import time
+    #    import time
     save_path = 'bch_api.zip'
     url = 'http://api.bestchange.ru/info.zip'
     target_directory = 'bch_files'
-    
- #   start_time = time.time()
+
+    #   start_time = time.time()
     download_url(url, save_path)
-  #  print(f'time to download: {-start_time + time.time()}')
-    
-   # start_time = time.time()
+    #  print(f'time to download: {-start_time + time.time()}')
+
+    # start_time = time.time()
     extract_zip(save_path, target_directory)
-    #print(f'time to extract: {time.time() - start_time}')  
+    # print(f'time to extract: {time.time() - start_time}')
 
     list_currencies = extract_dat('bch_files/bm_cy.dat')
     list_exch = extract_dat('bch_files/bm_exch.dat')
@@ -72,7 +73,7 @@ def read_data():
 if __name__ == '__main__':
     r = read_data()
     # print(c, e, sep='\n')
-   # print(len(r))
+# print(len(r))
 #    for r_i in r:
- #       if r_i['id_currency_give_away'] == 'QIWI RUB':
-  #          print(r_i)
+#       if r_i['id_currency_give_away'] == 'QIWI RUB':
+#          print(r_i)
