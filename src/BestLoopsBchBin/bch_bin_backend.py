@@ -21,7 +21,8 @@ def extract_dat(dat_path):
 def lowest_price_in_list(list_of_rs):
     best_offer = {'course_give_away': '10000000000000000'}
     for offer in list_of_rs:
-        if float(offer['course_give_away']) < float(best_offer['course_give_away']):
+        if float(offer['course_give_away']) < float(best_offer['course_give_away']) and offer[
+            'id_exchange'] not in BLACK_LIST_EX:
             best_offer = offer
     return best_offer
 
@@ -31,6 +32,7 @@ def prof(buy_p, sell_p):
 
 
 BLACK_LIST = ['Наличные', 'Perfect Money', 'UNI RUB']
+BLACK_LIST_EX = ['ExBox']
 
 
 def check_BL(offer):
@@ -203,6 +205,7 @@ def parse_all_from_bch():
 
 if __name__ == '__main__':
     import time
+
     t1 = time.time()
     a = parse_all_from_bch()
     print(time.time() - t1)
