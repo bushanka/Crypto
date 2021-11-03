@@ -25,13 +25,16 @@ def parse_all_info():
     parsed_all_binance = {}
     parsed_all_bitzlato = {}
 
+    check_norm_parse_bz = parse_bz(cryptocurrency=coins[0].upper(), pay_method=pay_types[0], order_type=trade_types[0])
     for types in pay_types:
         parsed_all_binance[types] = [{c: [binance_p2p_parser(c, trade_type=tr, payTypes=types) for tr in trade_types]}
                                      for c in coins]
-        sleep(20)
-        parsed_all_bitzlato[types] = [
-            {c: [parse_bz(cryptocurrency=c.upper(), pay_method=types, order_type=tr) for tr in order_t]} for c in coins]
-
+       # sleep(20)
+        if check_norm_parse_bz is not None:
+            parsed_all_bitzlato[types] = [
+                {c: [parse_bz(cryptocurrency=c.upper(), pay_method=types, order_type=tr) for tr in order_t]} for c in coins]
+        else:
+            parsed_all_bitzlato = None
     parse_all_gar = {}
 
     for c in coins:
@@ -129,11 +132,11 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
                         c)) * sell_price_on_binance_p2p * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
             # Bitzlato -> Garantex
             if parsed_bz is not None:
-                try:
-                    buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
-                except:
-                    parsed_bz = re_parse_bz()
-                    buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
+                #try:
+                buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
+               # except:
+                   # parsed_bz = re_parse_bz()
+                   # buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
                 sell_price_on_gar = float(parsed_gar[c]['asks'][0]['price'])
                 # print(parsed_bz[pay_met][num][c][0]['data'])
 
