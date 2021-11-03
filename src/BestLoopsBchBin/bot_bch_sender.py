@@ -4,7 +4,7 @@ from aiogram import Bot
 from aiogram import types
 from time import sleep as freezee
 from bch_bin_backend import parse_all_from_bch, filter_params
-from aiogram.utils.exceptions import BotBlocked
+from aiogram.utils.exceptions import BotBlocked, ChatNotFound,  RetryAfter
 import os
 
 TOKEN_QIWI = '2082105080:AAFdAAjb6eWlGqKQ_Gx__2dafmZ0WXbJGGY'
@@ -32,8 +32,8 @@ bot = Bot(token=TOKEN)
 #                                                    'main_settings', 'settings_bestchange_binance.db')
 
 
-path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'main_data.db')
-path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings',
+path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings', 'main_data.db')
+path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings',
                                                    'settings_bestchange_binance.db')
 
 
@@ -74,40 +74,96 @@ async def send_info_legacy(msg):
 # _______________________________________
 
 
-async def send_info(user_id, msg):
+async def send_info_legacy_2(user_id, msg):
     #user_id = 383367365
     for mes in msg[0][:5]:
         if mes['Paymethod'] == 0:  # QIWI
             try:
                 await bot_qiwi.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
         if mes['Paymethod'] == 1:  # CARDS
             try:
                 await bot_cards.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
         if mes['Paymethod'] == 2:  # NO CARDS
             try:
                 await bot_nocards.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
     for mes in msg[1][:5]:
         if mes['Paymethod'] == 0:  # QIWI
             try:
                 await bot_qiwi.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
         if mes['Paymethod'] == 1:  # CARDS
             try:
                 await bot_cards.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
         if mes['Paymethod'] == 2:  # NO CARDS
             try:
                 await bot_nocards.send_message(chat_id=user_id, text=mes['Text'], parse_mode=types.ParseMode.HTML)
-            except BotBlocked:
+            except (BotBlocked, ChatNotFound):
                 pass
+
+async def send_info(user_id, msg):
+    # user_id = 383367365
+    message_a_qiwi = []
+    message_a_cards = []
+    message_a_nocards = []
+    message_b_qiwi = []
+    message_b_cards = []
+    message_b_nocards = []
+    for mes in msg[0]:
+        if mes['Paymethod'] == 0:  # QIWI
+            message_a_qiwi.append(mes['Text'])
+        elif mes['Paymethod'] == 1:  # CARDS
+            message_a_cards.append(mes['Text'])
+        else:  # NO CARDS
+            message_a_nocards.append(mes['Text'])
+
+    for mes in msg[1]:
+        if mes['Paymethod'] == 0:  # QIWI
+            message_b_qiwi.append(mes['Text'])
+        elif mes['Paymethod'] == 1:  # CARDS
+            message_b_cards.append(mes['Text'])
+        else:  # NO CARDS
+            message_b_nocards.append(mes['Text'])
+
+    for send_inf in message_a_qiwi[:3]:
+        try:
+            await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
+    for send_inf in message_a_cards[:3]:
+        try:
+            await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
+    for send_inf in message_a_nocards[:3]:
+        try:
+            await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
+
+    for send_inf in message_b_qiwi[:3]:
+        try:
+            await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
+    for send_inf in message_b_cards[:3]:
+        try:
+            await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
+    for send_inf in message_b_nocards[:3]:
+        try:
+            await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+        except (BotBlocked, ChatNotFound, RetryAfter):
+            pass
 
 
 async def start():

@@ -58,6 +58,14 @@ def pair_to_link(token_a, token_b):
         code1 = 'tinkoff'
     if token_a == "Сбербанк":
         code1 = 'sberbank'
+    if token_a == "Ether Classic (ETC)":
+        code1 = "ethereum-classic"
+    if token_b == "Ether Classic (ETC)":
+        code2 = "ethereum-classic"
+    if token_a == "0x (ZRX)":
+        code1 = 'zrx'
+    if token_b == "0x (ZRX)":
+        code2 = "zrx"
     return "https://www.bestchange.ru/{}-to-{}.html".format(code1, code2)
 
 
@@ -74,7 +82,7 @@ def filter_params(min_percent, a_level, b_level):
                               pair_to_link(schemes['give'], schemes['get']))
             messages.append(
                 {
-                    'Text': f"[{link_text}] {schemes['give']} -> {schemes['get']} -> RUB"
+                    'Text': f"[{link_text}] {schemes['give']} -> {schemes['get']} -> {schemes['give']}"
                             f"\n\nBestChange: {schemes['buy_rate']}\n\nBinance: {schemes['sell_rate']}\n\n"
                             f"Спред {schemes['profit']:.3f} %", 'Paymethod': schemes['paymeth']})
 
@@ -88,9 +96,9 @@ def filter_params(min_percent, a_level, b_level):
                               pair_to_link(schemes['give'], schemes['get']))
             b_messages.append(
                 {'Text': f"[{link_text}] {schemes['give']} -> {schemes['get']} -> {schemes['binance_coin_buy']} -> "
-                         f"RUB\n\nBestChange: {schemes['buy_rate']}\n\nBinance"
+                         f"{schemes['give']}\n\nBestChange: {schemes['buy_rate']}\n\nBinance"
                          f" {schemes['get']}-{schemes['binance_coin_buy']}: {schemes['medium_rate']}\n\nBinance "
-                         f"{schemes['binance_coin_buy']}-RUB: {schemes['sell_rate']}\n\n"
+                         f"{schemes['binance_coin_buy']}-{schemes['give']}: {schemes['sell_rate']}\n\n"
                          f"Спред {schemes['profit']:.3f} %", 'Paymethod': schemes['paymeth']})
     for bm in b_messages:
         ans_b.append(bm)

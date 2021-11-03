@@ -8,8 +8,8 @@ from main import filter_param
 from main import parse_all_info
 import os
 
-path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings', 'main_data.db')
-path_settings_binance_garantex_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'main_settings',
+path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings', 'main_data.db')
+path_settings_binance_garantex_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings',
                                                  'settings_binance_garantex.db')
 
 TOKEN = '1913516507:AAG7oDMX5EuIHo9FPwLhpx5bI6Bcja3Anx0'
