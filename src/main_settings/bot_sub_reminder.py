@@ -9,7 +9,7 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.dispatcher import Dispatcher
 import os
 
-path_main_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business', 'Crypto_bot', 'Crypto',
+path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto', 'src',
                             'main_settings', 'main_data.db')
 
 bot = Bot(token='1971360278:AAEmqzP0fKTi2a_eaNcMMLn0386ouLuwIT0')
@@ -47,7 +47,7 @@ async def start():
         for user in subs_data:
             #   ______Проверяем время начала подписки______
             # ______Отписываем если прошло больше 30 дней______
-            print(today - dtmp.strptime(user[3], '%Y-%m-%d').date())
+           # print(today - dtmp.strptime(user[3], '%Y-%m-%d').date())
             if user[2] != 0 and user[3] is not None:  # Binance-Garantex_BestChange Scheme
                 delta = today - dtmp.strptime(user[3], '%Y-%m-%d').date()
                 if delta >= timedelta(days=30, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):

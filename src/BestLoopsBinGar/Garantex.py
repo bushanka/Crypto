@@ -9,7 +9,11 @@ def garantex_parser(coin='usdt'):
     host = 'garantex.io'  # Для тестового сервера используйте stage.garantex.biz
     ret = requests.get('https://' + host + '/api/v2/depth',
                        headers={'Authorization': 'Bearer ' + token}, params={'market': coin + 'rub'})
-    return ret.json()
+    try:
+        ans = ret.json()
+    except:
+        ans = None
+    return ans
 
 
 if __name__ == '__main__':

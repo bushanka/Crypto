@@ -23,7 +23,7 @@ CHAT_ID = -1001582710312
 bot_qiwi = Bot(token=TOKEN_QIWI)
 bot_cards = Bot(token=TOKEN_Cards)
 bot_nocards = Bot(token=TOKEN_NoCards)
-bot = Bot(token=TOKEN)
+#bot = Bot(token=TOKEN)
 # path_main_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business', 'Crypto_bot', 'Crypto', 'src',
 #                             'main_settings', 'main_data.db')
 # path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business',
@@ -172,7 +172,7 @@ async def start():
         records_list = sql_command("""SELECT * from settings_bestchange_binance""", path_settings_bestchange_binance_db)
 
         text = parse_all_from_bch()
-        await send_info_legacy(msg=filter_params(0.4, text[0], text[1]))
+       # await send_info_legacy(msg=filter_params(0.4, text[0], text[1]))
 
         coros_1 = []
         for iterate, user in enumerate(records_list):
@@ -181,7 +181,7 @@ async def start():
 
         await asyncio.gather(*coros_1)
 
-        await asyncio.sleep(55)
+        await asyncio.sleep(5)
 
 
 if __name__ == '__main__':

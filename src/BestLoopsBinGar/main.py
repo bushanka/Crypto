@@ -25,16 +25,12 @@ def parse_all_info():
     parsed_all_binance = {}
     parsed_all_bitzlato = {}
 
-    check_norm_parse_bz = parse_bz(cryptocurrency=coins[0].upper(), pay_method=pay_types[0], order_type=trade_types[0])
     for types in pay_types:
         parsed_all_binance[types] = [{c: [binance_p2p_parser(c, trade_type=tr, payTypes=types) for tr in trade_types]}
                                      for c in coins]
        # sleep(20)
-        if check_norm_parse_bz is not None:
-            parsed_all_bitzlato[types] = [
-                {c: [parse_bz(cryptocurrency=c.upper(), pay_method=types, order_type=tr) for tr in order_t]} for c in coins]
-        else:
-            parsed_all_bitzlato = None
+        parsed_all_bitzlato[types] = [
+            {c: [parse_bz(cryptocurrency=c.upper(), pay_method=types, order_type=tr) for tr in order_t]} for c in coins]
     parse_all_gar = {}
 
     for c in coins:
@@ -93,45 +89,55 @@ def filter_param(volume, payment_method, parsed_binance, parsed_gar, parsed_bz, 
                 decode_key()
                 parsed_gar = re_parse_gar()
                 sell_price_on_gar = float(parsed_gar[c]['asks'][0]['price'])
-            buy_price_on_binance_p2p = float(parsed_binance[pay_met][num][c][0][-1]['price'])
+            if parsed_gar[c] is not None: 
+                buy_price_on_binance_p2p = float(parsed_binance[pay_met][num][c][0][-1]['price'])
 
-            for seller in parsed_binance[pay_met][num][c][0]:
-                if seller['numberOfDeals'] >= 30 and float(seller['minAmount']) <= min_amount:
-                    buy_price_on_binance_p2p = float(seller['price'])
-                    break
+                for seller in parsed_binance[pay_met][num][c][0]:
+                    if seller['numberOfDeals'] >= 30 and float(seller['minAmount']) <= min_amount:
+                        buy_price_on_binance_p2p = float(seller['price'])
+                        break
 
-            profit = ((volume / (buy_price_on_binance_p2p * 1.001) - fee_transfer(
-                c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
+                profit = ((volume / (buy_price_on_binance_p2p * 1.001) - fee_transfer(
+                    c)) * sell_price_on_gar * 0.9985 - volume) / volume * 100
 
-            if profit > percent and is_pay_meth and ((is_binance_usdt == 1 and c=='usdt') or (is_binance_eth == 1 and c=='eth') or (is_binance_btc and c=='btc')) :
-                send_to_user_info_on_bin_gar.append(
-                    f'{c.upper()}\n\n' + 'Цена Binance P2P ' + pay_met +
-                    ': \n{:,} ₽\n\n'.format(
-                        buy_price_on_binance_p2p) + 'Цена Garantex: \n{:,} ₽\n\n'.format(
-                        sell_price_on_gar) + '\n\nВаш нижний лимит: {:,} ₽\n\n'.format(
-                        min_amount) + 'Прибыль: {:,.3f} ₽\n\n'.format(
-                        (volume / (buy_price_on_binance_p2p * 1.0015) - fee_transfer(
-                            c)) * sell_price_on_gar * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
+                if profit > percent and is_pay_meth and ((is_binance_usdt == 1 and c=='usdt') or (is_binance_eth == 1 and c=='eth') or (is_binance_btc and c=='btc')) :
+                    send_to_user_info_on_bin_gar.append(
+                        f'{c.upper()}\n\n' + 'Цена Binance P2P ' + pay_met +
+                        ': \n{:,} ₽\n\n'.format(
+                            buy_price_on_binance_p2p) + 'Цена Garantex: \n{:,} ₽\n\n'.format(
+                            sell_price_on_gar) + '\n\nВаш нижний лимит: {:,} ₽\n\n'.format(
+                            min_amount) + 'Прибыль: {:,.3f} ₽\n\n'.format(
+                            (volume / (buy_price_on_binance_p2p * 1.0015) - fee_transfer(
+                                c)) * sell_price_on_gar * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
             # Garantex -> Binance
-            buy_price_on_gar = float(parsed_gar[c]['bids'][0]['price'])
-            sell_price_on_binance_p2p = float(parsed_binance[pay_met][num][c][1][-1]['price'])
+            if parsed_gar[c] is not None:
+                buy_price_on_gar = float(parsed_gar[c]['bids'][0]['price'])
+                sell_price_on_binance_p2p = float(parsed_binance[pay_met][num][c][1][-1]['price'])
 
-            for seller in parsed_binance[pay_met][num][c][1]:
-                if seller['numberOfDeals'] >= 30 and float(seller['maxAmount']) >= volume:
-                    sell_price_on_binance_p2p = float(seller['price'])
-                    break
-            profit = ((volume / (buy_price_on_gar * 1.0015) - fee_transfer(
-                c)) * sell_price_on_binance_p2p * 0.999 - volume) / volume * 100
-            if profit > percent and is_pay_meth and ((is_gar_usdt == 1 and c=='usdt') or (is_gar_eth == 1 and c=='eth') or (is_gar_btc and c=='btc')):
-                send_to_user_info_on_gar_bin.append(f'{c.upper()}\n\n' +
-                                                    'Цена Garantex: \n{:,} ₽\n\n'.format(buy_price_on_gar) +
-                                                    'Цена Binance P2P ' + pay_met + ': \n{:,} ₽'.format(
-                    sell_price_on_binance_p2p) + '\n\nВаш объем: {:,} ₽\n\n'.format(
-                    volume) + 'Прибыль: {:,.3f} ₽\n\n'.format(
-                    (volume / (buy_price_on_gar * 1.0015) - fee_transfer(
-                        c)) * sell_price_on_binance_p2p * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
+                for seller in parsed_binance[pay_met][num][c][1]:
+                    if seller['numberOfDeals'] >= 30 and float(seller['maxAmount']) >= volume:
+                        sell_price_on_binance_p2p = float(seller['price'])
+                        break
+                profit = ((volume / (buy_price_on_gar * 1.0015) - fee_transfer(
+                    c)) * sell_price_on_binance_p2p * 0.999 - volume) / volume * 100
+                if profit > percent and is_pay_meth and ((is_gar_usdt == 1 and c=='usdt') or (is_gar_eth == 1 and c=='eth') or (is_gar_btc and c=='btc')):
+                    send_to_user_info_on_gar_bin.append(f'{c.upper()}\n\n' +
+                                                        'Цена Garantex: \n{:,} ₽\n\n'.format(buy_price_on_gar) +
+                                                        'Цена Binance P2P ' + pay_met + ': \n{:,} ₽'.format(
+                        sell_price_on_binance_p2p) + '\n\nВаш объем: {:,} ₽\n\n'.format(
+                        volume) + 'Прибыль: {:,.3f} ₽\n\n'.format(
+                        (volume / (buy_price_on_gar * 1.0015) - fee_transfer(
+                            c)) * sell_price_on_binance_p2p * 0.999 - volume) + 'Процент: {:.3f} %\n\n'.format(profit))
             # Bitzlato -> Garantex
-            if parsed_bz is not None:
+            if parsed_bz[pay_met][num][c][0] is not None:
+                try:
+                    parsed_bz[pay_met][num][c][0]['data']
+                    bz_to_go = True
+                except KeyError:
+                    bz_to_go = False
+            else:
+                bz_to_go = False
+            if bz_to_go:
                 #try:
                 buy_price_on_bz = float(parsed_bz[pay_met][num][c][0]['data'][0]['rate'])
                # except:

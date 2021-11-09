@@ -1,0 +1,11 @@
+2
+Traceback (most recent call last):
+  File "test_error_output.py", line 10, in <module>
+    asyncio.run(t1())
+  File "/usr/lib/python3.8/asyncio/runners.py", line 43, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "test_error_output.py", line 7, in t1
+    print(1 + 'ff')
+TypeError: unsupported operand type(s) for +: 'int' and 'str'

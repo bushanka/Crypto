@@ -68,6 +68,15 @@ def pair_to_link(token_a, token_b):
         code1 = 'zrx'
     if token_b == "0x (ZRX)":
         code2 = "zrx"
+    if token_a == "OmiseGO (OMG)":
+        code1 = "omg"
+    if token_b == "OmiseGO (OMG)":
+        code2 = "omg"
+    if token_a == "Binance USD (BUSD)":
+        code1 = "busd"
+    if token_b == "Binance USD (BUSD)":
+        code2 = "busd"
+
     return "https://www.bestchange.ru/{}-to-{}.html".format(code1, code2)
 
 
