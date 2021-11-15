@@ -35,7 +35,8 @@ bot_nocards = Bot(token=TOKEN_NoCards)
 path_main_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings', 'main_data.db')
 path_settings_bestchange_binance_db = os.path.join(os.path.expanduser('~'), 'Crypto','src', 'main_settings',
                                                    'settings_bestchange_binance.db')
-
+#headers = requests.utils.default_headers()
+#headers['User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
 
 def sql_command(command_text, data_base_name='main_data.db', params=None):
     """Функция для отправки SQL запросов"""

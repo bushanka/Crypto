@@ -8,9 +8,11 @@ from bin_parse import find_all_pairs_bc, find_all_pairs_ca
 
 from aiogram.utils.markdown import hlink
 
-api_key = 'CWGUCrd8vlO0LxcETIHNREHvkYionvrsjVBI8cebz1FJeZbxRFf4RAMtHu50lNT6'
-api_secret = '27EQ7gSL8EskW338q5uh0Wk3DibCp5ZceLsfzTR2Gp803gLAaANz3Pb5ouPQLz0F'
-client = Client(api_key, api_secret)
+
+
+api_key = 's4v3IIr7nIRCAO13S1iyM3Yx1sR2X6ExMSxOEnk2cEMiE44QuAxpTNUQI2iRvzTN'
+api_secret = 'klkrvk93V8Jns80Ni6s8cWOt0YeU2SVIlDWHc32BEENudMKMTNLlimb2lZaMCLr9'
+#client = Client(api_key, api_secret)
 
 
 def extract_dat(dat_path):
@@ -19,7 +21,7 @@ def extract_dat(dat_path):
 
 
 def lowest_price_in_list(list_of_rs):
-    best_offer = {'course_give_away': '10000000000000000'}
+    best_offer = {'course_give_away': '10000000000000000', 'id_exchange': None, 'id_currency_give_away': None, 'id_currency_get' : None}
     for offer in list_of_rs:
         if float(offer['course_give_away']) < float(best_offer['course_give_away']) and offer[
             'id_exchange'] not in BLACK_LIST_EX:
@@ -32,8 +34,8 @@ def prof(buy_p, sell_p):
 
 
 BLACK_LIST = ['Наличные', 'Perfect Money', 'UNI RUB']
-BLACK_LIST_EX = ['ExBox']
-
+BLACK_LIST_EX = ['ExBox', 'Changelly', 'AvanChange', 'OpenChange', 'МультиВал', 'ImExchanger', 'ExchangeTeam', 'CryptoPay24', 'Quickex', 'FixedFloat']
+# ХЗ насчет Changelly, может и норм, но заебал спамить в 1 момент
 
 def check_BL(offer):
     for elem in BLACK_LIST:
@@ -118,7 +120,7 @@ def filter_params(min_percent, a_level, b_level):
 
 init_points = {'ETH': ['Ethereum (ETH)'],
                'RUB': ["QIWI RUB", "Тинькофф", "Сбербанк"],
-               'USDT': ["Tether Omni (USDT)", "Tether ERC20 (USDT)", "Tether TRC20 (USDT)", "Tether BEP20 (USDT)"],
+               'USDT': ["Tether Omni (USDT)", "Tether TRC20 (USDT)", "Tether BEP20 (USDT)"], # "Tether ERC20 (USDT)"
                'USDC': ["USDC"],
                'TUSD': ["TrueUSD"],
                'USDP': ["Pax Dollar"],
@@ -201,6 +203,7 @@ def start_parse_bch(token, sources, ALL_TICKERS, BCH_DATA):
 
 
 def parse_all_from_bch():
+    client = Client(api_key, api_secret)
     all_tick = client.get_orderbook_tickers()
     bch = read_data()
     all_a_level = []
