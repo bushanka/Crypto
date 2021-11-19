@@ -90,7 +90,7 @@ async def start():
                     send_info(user_id=user[0], texts_list_bin_gar=bin_gar_info, texts_list_gar_bin=gar_bin_info,
                               texts_list_bz_gar=bz_gar_info))
         await asyncio.gather(*coros_1)
-        await asyncio.sleep(60)
+        await asyncio.sleep(300)
 
         # if float(parse_rub()) < 1.00:
         #     await bot.send_message(chat_id=CHAT_ID, text='BINANCE\n\nМожно купить баланс биржы 1 ₽ за 0.99 ₽')

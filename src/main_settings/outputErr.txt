@@ -1,0 +1,49 @@
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+True
+Traceback (most recent call last):
+  File "bot_sub_reminder.py", line 140, in <module>
+    asyncio.run(start())
+  File "/usr/lib/python3.8/asyncio/runners.py", line 43, in run
+    return loop.run_until_complete(main)
+  File "uvloop/loop.pyx", line 1501, in uvloop.loop.Loop.run_until_complete
+  File "bot_sub_reminder.py", line 67, in start
+    delta = today - dtmp.strptime(user[6], '%Y-%m-%d').date()
+  File "/usr/lib/python3.8/_strptime.py", line 568, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+  File "/usr/lib/python3.8/_strptime.py", line 349, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data ' 2021-10-20' does not match format '%Y-%m-%d'
+Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f128aa75610>

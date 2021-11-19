@@ -66,8 +66,10 @@ async def start_command(message: types.Message):
                        + f'ID: {user_info[0]}\n\n' + f'Nick: {user_info[1]}\n\n' \
                        + f'Is Subscruber Bin Gar: {user_info[2]}\n\n' \
                        + f'Time Subscribed: {user_info[3]}\n\n' \
+                       + f'Is test access: {user_info[4]}\n\n'\
                        + f'Is Subscruber Bestch Bin: {user_info[5]}\n\n' \
                        + f'Time Subscribed: {user_info[6]}\n\n' \
+                       + f'Is test access: {user_info[7]}\n\n'\
                        + '___________________________________'
 
             await bot.send_message(chat_id=MY_ID, text=send_msg)

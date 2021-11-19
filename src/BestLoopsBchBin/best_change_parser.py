@@ -60,14 +60,22 @@ def read_data():
     #          'id_exchange': rates_id.split(';')[2], 'course_give_away': rates_id.split(';')[3],
     #          'course_get': rates_id.split(';')[4], 'capacity': rates_id.split(';')[5], 'review': rates_id.split(';')[6]}
     #         for rates_id in list_rates[0]] # Долго сплитит, надо изменять файл dat после загрузки. Замена ;->,
-
     return [{'id_currency_give_away': curs[rates_id.split(';')[0]],
              'id_currency_get': curs[rates_id.split(';')[1]],
              'id_exchange': exchangers[rates_id.split(';')[2]],
              'course_give_away': rates_id.split(';')[3],
              'course_get': rates_id.split(';')[4],
              'capacity': rates_id.split(';')[5],
-             'review': rates_id.split(';')[6]} for rates_id in list_rates[0]]
+             'review': rates_id.split(';')[6]} for rates_id in list_rates[0] if id_error_catcher(exchangers, rates_id.split(';')) is False]
+
+
+def id_error_catcher(exchangers, rates_id):
+    exch_id = rates_id[2]
+    try:
+        exchangers[rates_id[2]]
+        return False
+    except KeyError:
+        return True
 
 
 if __name__ == '__main__':

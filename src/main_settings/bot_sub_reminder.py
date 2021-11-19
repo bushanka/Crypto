@@ -48,8 +48,8 @@ async def start():
             #   ______Проверяем время начала подписки______
             # ______Отписываем если прошло больше 30 дней______
            # print(today - dtmp.strptime(user[3], '%Y-%m-%d').date())
-            if user[2] != 0 and user[3] is not None:  # Binance-Garantex_BestChange Scheme
-                delta = today - dtmp.strptime(user[3], '%Y-%m-%d').date()
+            if user[2] != 0 and (user[3] is not None and user[3] != 'None'):  # Binance-Garantex_BestChange Scheme
+                delta = today - dtmp.strptime(user[3].strip(), '%Y-%m-%d').date()
                 if delta >= timedelta(days=30, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
                     sql_command("""UPDATE main_users_data SET subscriber_binance_garantex = ? WHERE userid = ?;""",
                                 params=(0, user[0]), data_base_name=path_main_db)
@@ -61,8 +61,10 @@ async def start():
                     except:
                         pass
 
-            if user[5] != 0 and user[6] is not None:  # BestChange_Binance Scheme
-                delta = today - dtmp.strptime(user[6], '%Y-%m-%d').date()
+            if user[5] != 0 and (user[6] is not None and user[6] != 'None'):
+                # BestChange_Binance Scheme
+                print(user[6] is not None)
+                delta = today - dtmp.strptime(user[6].strip(), '%Y-%m-%d').date()
                 if delta >= timedelta(days=30, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
                     sql_command("""UPDATE main_users_data SET subscriber_bestchange_binance = ? WHERE userid = ?;""",
                                 params=(0, user[0]), data_base_name=path_main_db)
@@ -74,8 +76,8 @@ async def start():
                     except:
                         pass
 
-            if user[8] != 0 and user[9] is not None:  # Garantex_BestChange Scheme
-                delta = today - dtmp.strptime(user[9], '%Y-%m-%d').date()
+            if user[8] != 0 and (user[9] is not None and user[9] != 'None'):  # Garantex_BestChange Scheme
+                delta = today - dtmp.strptime(user[9].strip(), '%Y-%m-%d').date()
                 if delta >= timedelta(days=30, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
                     sql_command("""UPDATE main_users_data SET subscriber_bestchange_garantex = ? WHERE userid = ?;""",
                                 params=(0, user[0]), data_base_name=path_main_db)
@@ -89,8 +91,8 @@ async def start():
 
             #   ______Проверяем время начала подписки______
             # ______Высылаем сообщение что подписка скоро кончится______
-            if user[2] != 0 and user[3] is not None:
-                delta = today - dtmp.strptime(user[3], '%Y-%m-%d').date()
+            if user[2] != 0 and (user[3] is not None and user[3] != 'None'):
+                delta = today - dtmp.strptime(user[3].strip(), '%Y-%m-%d').date()
                 if timedelta(days=29, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0,
                              weeks=0) <= delta < timedelta(days=30, seconds=0, microseconds=0, milliseconds=0,
                                                            minutes=0,
@@ -103,8 +105,8 @@ async def start():
                                                     "оплатить подписку")
                     except:
                         pass
-            if user[5] != 0 and user[6] is not None:
-                delta = today - dtmp.strptime(user[6], '%Y-%m-%d').date()
+            if user[5] != 0 and (user[6] is not None and user[6] != 'None'):
+                delta = today - dtmp.strptime(user[6].strip(), '%Y-%m-%d').date()
                 if timedelta(days=29, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0,
                              weeks=0) <= delta < timedelta(days=30, seconds=0, microseconds=0, milliseconds=0,
                                                            minutes=0,
@@ -117,8 +119,8 @@ async def start():
                                                     "оплатить подписку")
                     except:
                         pass
-            if user[8] != 0 and user[9] is not None:
-                delta = today - dtmp.strptime(user[9], '%Y-%m-%d').date()
+            if user[8] != 0 and (user[9] is not None and user[9] != 'None'):
+                delta = today - dtmp.strptime(user[9].strip(), '%Y-%m-%d').date()
                 if timedelta(days=29, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0,
                              weeks=0) <= delta < timedelta(days=30, seconds=0, microseconds=0, milliseconds=0,
                                                            minutes=0,
