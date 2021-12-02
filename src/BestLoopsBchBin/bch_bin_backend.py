@@ -34,7 +34,7 @@ def prof(buy_p, sell_p):
 
 
 BLACK_LIST = ['Наличные', 'Perfect Money', 'UNI RUB']
-BLACK_LIST_EX = ['ExBox', 'Changelly', 'AvanChange', 'OpenChange', 'МультиВал', 'ImExchanger', 'ExchangeTeam', 'CryptoPay24', 'Quickex', 'FixedFloat']
+BLACK_LIST_EX = ['ExBox', 'Changelly', 'AvanChange', 'OpenChange', 'МультиВал', 'ImExchanger', 'ExchangeTeam', 'CryptoPay24', 'Quickex', 'FixedFloat', 'Exolix', 'E-Scrooge']
 # ХЗ насчет Changelly, может и норм, но заебал спамить в 1 момент
 
 def check_BL(offer):
@@ -212,6 +212,7 @@ def parse_all_from_bch():
         msg = start_parse_bch(point[0], point[1], BCH_DATA=bch, ALL_TICKERS=all_tick)
         all_a_level += msg[0]
         all_b_level += msg[1]
+    client.close_connection()
     return all_a_level, all_b_level
 
 

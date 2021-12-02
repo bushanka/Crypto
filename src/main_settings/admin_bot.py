@@ -1,5 +1,5 @@
 import sqlite3
-
+import subprocess
 from aiogram import Bot, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
@@ -48,7 +48,7 @@ def sql_command(command_text, data_base_name='main_data.db', params=None):
 async def start_command(message: types.Message):
     """Функция запуска бота. """
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID,
                                text="Ready")
     else:
@@ -59,7 +59,7 @@ async def start_command(message: types.Message):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         data = sql_command("""SELECT * FROM main_users_data""", data_base_name=path_main_db)
         for user_info in data:
             send_msg = '___________________________________\n\n' \
@@ -81,7 +81,7 @@ async def start_command(message: types.Message):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me info: userid,time')
         await Cases.STATE_CHANGE_TIME_BIN_GAR_BZ.set()
     else:
@@ -106,7 +106,7 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to unsubscribe')
         await Cases.STATE_UNSUBSCRIBE_BIN_GAR_BZ.set()
     else:
@@ -129,7 +129,7 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to subscribe')
         await Cases.STATE_SUBSCRIBE_BIN_GAR_BZ.set()
     else:
@@ -152,7 +152,7 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me info: userid,time')
         await Cases.STATE_CHANGE_TIME_BCH_BIN.set()
     else:
@@ -177,7 +177,7 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to unsubscribe')
         await Cases.STATE_UNSUBSCRIBE_BCH_BIN.set()
     else:
@@ -200,7 +200,7 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID:
+    if is_my_id == MY_ID or is_my_id == 489197056:
         await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to subscribe')
         await Cases.STATE_SUBSCRIBE_BCH_BIN.set()
     else:
@@ -217,6 +217,51 @@ async def settings(message: types.Message, state: FSMContext):
         await state.reset_state()
     except:
         await bot.send_message(chat_id=MY_ID, text='Error!\nTry again')
+
+
+@dp.message_handler(commands=['bots_status'])
+async def start_command(message: types.Message):
+    """Вывод статусов ботов"""
+    is_my_id = message.chat.id
+    if is_my_id == MY_ID or is_my_id == 489197056:
+        s = subprocess.getstatusoutput(f'ps -ef | grep python3')[1].split()
+        await bot.send_message(chat_id=MY_ID, text="Running:")
+        for text_soup in s:
+            if "bot" in text_soup:
+                await bot.send_message(chat_id=MY_ID, text=text_soup)
+       # await bot.send_message(chat_id=MY_ID, text=s[1].split())
+    else:
+        pass
+
+
+
+@dp.message_handler(commands=['execute_bot_bingar_test'])
+async def start_command(message: types.Message):
+    is_my_id = message.chat.id
+    if is_my_id == MY_ID or is_my_id == 489197056:
+        s = subprocess.getstatusoutput(f'python3 Crypto/src/BestLoopsBinGar/bot_sender.py >& outputErr.txt &')
+        if s[0] == 0:
+            await bot.send_message(chat_id=MY_ID, text='Success')
+        else:
+           await bot.send_message(chat_id=MY_ID, text='Error!')
+        print(s)
+       # await bot.send_message(chat_id=MY_ID, text=s[1].split())
+    else:
+        pass
+
+@dp.message_handler(commands=['execute_bot_bchbin_test'])
+async def start_command(message: types.Message):
+    is_my_id = message.chat.id
+    if is_my_id == MY_ID or is_my_id == 489197056:
+        s = subprocess.getstatusoutput(f'python3 Crypto//src//BestLoopsBchBin//bot_bch_sender.py >& outputErr.txt & disown')[0]
+        if s == 0:
+            await bot.send_message(chat_id=MY_ID, text='Success')
+        else:
+           await bot.send_message(chat_id=MY_ID, text='Error!')
+       # await bot.send_message(chat_id=MY_ID, text=s[1].split())
+    else:
+        pass
+
 
 
 if __name__ == '__main__':
