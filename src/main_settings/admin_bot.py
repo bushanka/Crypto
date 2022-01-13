@@ -12,7 +12,7 @@ bot = Bot(token='2111176226:AAGGXMqDKARkFpRDkgbT6pj88HhONrh1-_w')
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
-MY_ID = 383367365
+MY_ID = (383367365, 489197056)
 
 # path_main_db = os.path.join(os.path.expanduser('D:\\'), 'MyDesctopFiles', 'business', 'CryptoBot', 'Crypto', 'src',
 #                             'main_settings', 'main_data.db')
@@ -48,8 +48,8 @@ def sql_command(command_text, data_base_name='main_data.db', params=None):
 async def start_command(message: types.Message):
     """Функция запуска бота. """
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID,
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id,
                                text="Ready")
     else:
         pass
@@ -59,7 +59,7 @@ async def start_command(message: types.Message):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
+    if is_my_id in MY_ID:
         data = sql_command("""SELECT * FROM main_users_data""", data_base_name=path_main_db)
         for user_info in data:
             send_msg = '___________________________________\n\n' \
@@ -72,7 +72,7 @@ async def start_command(message: types.Message):
                        + f'Is test access: {user_info[7]}\n\n'\
                        + '___________________________________'
 
-            await bot.send_message(chat_id=MY_ID, text=send_msg)
+            await bot.send_message(chat_id=is_my_id, text=send_msg)
     else:
         pass
 
@@ -81,8 +81,8 @@ async def start_command(message: types.Message):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me info: userid,time')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me info: userid,time')
         await Cases.STATE_CHANGE_TIME_BIN_GAR_BZ.set()
     else:
         pass
@@ -92,10 +92,11 @@ async def start_command(message: types.Message):
 async def settings(message: types.Message, state: FSMContext):
     list_msg = message.text.split(',')
     msg_userid, msg_usertime = list_msg[0], list_msg[1]
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET time_subscribe_binance_garantex = ? WHERE userid = ?;""",
                     params=(msg_usertime, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
 
     except:
@@ -106,8 +107,8 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to unsubscribe')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me userid to unsubscribe')
         await Cases.STATE_UNSUBSCRIBE_BIN_GAR_BZ.set()
     else:
         pass
@@ -116,21 +117,22 @@ async def start_command(message: types.Message):
 @dp.message_handler(state=Cases.STATE_UNSUBSCRIBE_BIN_GAR_BZ)
 async def settings(message: types.Message, state: FSMContext):
     msg_userid = message.text
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET subscriber_binance_garantex = ? WHERE userid = ?;""",
                     params=(0, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
     except:
-        await bot.send_message(chat_id=MY_ID, text='Error!\nTry again')
+        await bot.send_message(chat_id=is_my_id, text='Error!\nTry again')
 
 
 @dp.message_handler(commands=['subscribe_bin_gar_bz'])
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to subscribe')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me userid to subscribe')
         await Cases.STATE_SUBSCRIBE_BIN_GAR_BZ.set()
     else:
         pass
@@ -139,21 +141,22 @@ async def start_command(message: types.Message):
 @dp.message_handler(state=Cases.STATE_SUBSCRIBE_BIN_GAR_BZ)
 async def settings(message: types.Message, state: FSMContext):
     msg_userid = message.text
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET subscriber_binance_garantex = ? WHERE userid = ?;""",
                     params=(1, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
     except:
-        await bot.send_message(chat_id=MY_ID, text='Error!\nTry again')
+        await bot.send_message(chat_id=is_my_id, text='Error!\nTry again')
 
 
 @dp.message_handler(commands=['time_bch_bin'])
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me info: userid,time')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me info: userid,time')
         await Cases.STATE_CHANGE_TIME_BCH_BIN.set()
     else:
         pass
@@ -163,10 +166,11 @@ async def start_command(message: types.Message):
 async def settings(message: types.Message, state: FSMContext):
     list_msg = message.text.split(',')
     msg_userid, msg_usertime = list_msg[0], list_msg[1]
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET time_subscribe_bestchange_binance = ? WHERE userid = ?;""",
                     params=(msg_usertime, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
 
     except:
@@ -177,8 +181,8 @@ async def settings(message: types.Message, state: FSMContext):
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to unsubscribe')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me userid to unsubscribe')
         await Cases.STATE_UNSUBSCRIBE_BCH_BIN.set()
     else:
         pass
@@ -187,21 +191,22 @@ async def start_command(message: types.Message):
 @dp.message_handler(state=Cases.STATE_UNSUBSCRIBE_BCH_BIN)
 async def settings(message: types.Message, state: FSMContext):
     msg_userid = message.text
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET subscriber_bestchange_binance = ? WHERE userid = ?;""",
                     params=(0, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
     except:
-        await bot.send_message(chat_id=MY_ID, text='Error!\nTry again')
+        await bot.send_message(chat_id=is_my_id, text='Error!\nTry again')
 
 
 @dp.message_handler(commands=['subscribe_bch_bin'])
 async def start_command(message: types.Message):
     """Отображение всех пользователей"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
-        await bot.send_message(chat_id=MY_ID, text='Ok. Send me userid to subscribe')
+    if is_my_id in MY_ID:
+        await bot.send_message(chat_id=is_my_id, text='Ok. Send me userid to subscribe')
         await Cases.STATE_SUBSCRIBE_BCH_BIN.set()
     else:
         pass
@@ -210,25 +215,26 @@ async def start_command(message: types.Message):
 @dp.message_handler(state=Cases.STATE_SUBSCRIBE_BCH_BIN)
 async def settings(message: types.Message, state: FSMContext):
     msg_userid = message.text
+    is_my_id = message.chat.id
     try:
         sql_command("""UPDATE main_users_data SET subscriber_bestchange_binance = ? WHERE userid = ?;""",
                     params=(1, int(msg_userid)), data_base_name=path_main_db)
-        await bot.send_message(chat_id=MY_ID, text='Success')
+        await bot.send_message(chat_id=is_my_id, text='Success')
         await state.reset_state()
     except:
-        await bot.send_message(chat_id=MY_ID, text='Error!\nTry again')
+        await bot.send_message(chat_id=is_my_id, text='Error!\nTry again')
 
 
 @dp.message_handler(commands=['bots_status'])
 async def start_command(message: types.Message):
     """Вывод статусов ботов"""
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
+    if is_my_id in MY_ID:
         s = subprocess.getstatusoutput(f'ps -ef | grep python3')[1].split()
-        await bot.send_message(chat_id=MY_ID, text="Running:")
+        await bot.send_message(chat_id=is_my_id, text="Running:")
         for text_soup in s:
             if "bot" in text_soup:
-                await bot.send_message(chat_id=MY_ID, text=text_soup)
+                await bot.send_message(chat_id=is_my_id, text=text_soup)
        # await bot.send_message(chat_id=MY_ID, text=s[1].split())
     else:
         pass
@@ -238,12 +244,12 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['execute_bot_bingar_test'])
 async def start_command(message: types.Message):
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
+    if is_my_id in MY_ID:
         s = subprocess.getstatusoutput(f'python3 Crypto/src/BestLoopsBinGar/bot_sender.py >& outputErr.txt &')
         if s[0] == 0:
-            await bot.send_message(chat_id=MY_ID, text='Success')
+            await bot.send_message(chat_id=is_my_id, text='Success')
         else:
-           await bot.send_message(chat_id=MY_ID, text='Error!')
+           await bot.send_message(chat_id=is_my_id, text='Error!')
         print(s)
        # await bot.send_message(chat_id=MY_ID, text=s[1].split())
     else:
@@ -252,12 +258,12 @@ async def start_command(message: types.Message):
 @dp.message_handler(commands=['execute_bot_bchbin_test'])
 async def start_command(message: types.Message):
     is_my_id = message.chat.id
-    if is_my_id == MY_ID or is_my_id == 489197056:
+    if is_my_id in MY_ID:
         s = subprocess.getstatusoutput(f'python3 Crypto//src//BestLoopsBchBin//bot_bch_sender.py >& outputErr.txt & disown')[0]
         if s == 0:
-            await bot.send_message(chat_id=MY_ID, text='Success')
+            await bot.send_message(chat_id=is_my_id, text='Success')
         else:
-           await bot.send_message(chat_id=MY_ID, text='Error!')
+           await bot.send_message(chat_id=is_my_id, text='Error!')
        # await bot.send_message(chat_id=MY_ID, text=s[1].split())
     else:
         pass

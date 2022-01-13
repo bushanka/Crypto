@@ -1,0 +1,68 @@
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/contrib/pyopenssl.py", line 485, in wrap_socket
+    cnx.do_handshake()
+  File "/usr/lib/python3/dist-packages/OpenSSL/SSL.py", line 1915, in do_handshake
+    self._raise_ssl_error(self._ssl, result)
+  File "/usr/lib/python3/dist-packages/OpenSSL/SSL.py", line 1639, in _raise_ssl_error
+    raise SysCallError(errno, errorcode.get(errno))
+OpenSSL.SSL.SysCallError: (104, 'ECONNRESET')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 665, in urlopen
+    httplib_response = self._make_request(
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 376, in _make_request
+    self._validate_conn(conn)
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 996, in _validate_conn
+    conn.connect()
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 352, in connect
+    self.sock = ssl_wrap_socket(
+  File "/usr/lib/python3/dist-packages/urllib3/util/ssl_.py", line 370, in ssl_wrap_socket
+    return context.wrap_socket(sock, server_hostname=server_hostname)
+  File "/usr/lib/python3/dist-packages/urllib3/contrib/pyopenssl.py", line 491, in wrap_socket
+    raise ssl.SSLError("bad handshake: %r" % e)
+ssl.SSLError: ("bad handshake: SysCallError(104, 'ECONNRESET')",)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 719, in urlopen
+    retries = retries.increment(
+  File "/usr/lib/python3/dist-packages/urllib3/util/retry.py", line 436, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='fapi.binance.com', port=443): Max retries exceeded with url: /bapi/c2c/v2/friendly/c2c/adv/search (Caused by SSLError(SSLError("bad handshake: SysCallError(104, 'ECONNRESET')")))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "bot_sender.py", line 102, in <module>
+    asyncio.run(start())
+  File "/usr/lib/python3.8/asyncio/runners.py", line 43, in run
+    return loop.run_until_complete(main)
+  File "uvloop/loop.pyx", line 1501, in uvloop.loop.Loop.run_until_complete
+  File "bot_sender.py", line 71, in start
+    b, g, bz = parse_all_info()
+  File "/root/Crypto/src/BestLoopsBinGar/main.py", line 29, in parse_all_info
+    parsed_all_binance[types] = [{c: [binance_p2p_parser(c, trade_type=tr, payTypes=types) for tr in trade_types]}
+  File "/root/Crypto/src/BestLoopsBinGar/main.py", line 29, in <listcomp>
+    parsed_all_binance[types] = [{c: [binance_p2p_parser(c, trade_type=tr, payTypes=types) for tr in trade_types]}
+  File "/root/Crypto/src/BestLoopsBinGar/main.py", line 29, in <listcomp>
+    parsed_all_binance[types] = [{c: [binance_p2p_parser(c, trade_type=tr, payTypes=types) for tr in trade_types]}
+  File "/root/Crypto/src/BestLoopsBinGar/BinanceP2P.py", line 26, in binance_p2p_parser
+    r = requests.post('https://fapi.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', headers=headers, json=data)
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 116, in post
+    return request('post', url, data=data, json=json, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 60, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 533, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 646, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 514, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='fapi.binance.com', port=443): Max retries exceeded with url: /bapi/c2c/v2/friendly/c2c/adv/search (Caused by SSLError(SSLError("bad handshake: SysCallError(104, 'ECONNRESET')")))
+Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f1e078f5a00>

@@ -133,38 +133,78 @@ async def send_info(user_id, msg):
             message_b_cards.append(mes['Text'])
         else:  # NO CARDS
             message_b_nocards.append(mes['Text'])
+    if type(user_id) != list:
+        for send_inf in message_a_qiwi[:3]:
+            try:
+                await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+        for send_inf in message_a_cards[:3]:
+            try:
+                await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+        for send_inf in message_a_nocards[:3]:
+            try:
+                await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
 
-    for send_inf in message_a_qiwi[:3]:
-        try:
-            await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
-    for send_inf in message_a_cards[:3]:
-        try:
-            await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
-    for send_inf in message_a_nocards[:3]:
-        try:
-            await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
+        for send_inf in message_b_qiwi[:3]:
+            try:
+                await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+        for send_inf in message_b_cards[:3]:
+            try:
+                await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+        for send_inf in message_b_nocards[:3]:
+            try:
+                await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+    else:
+        for send_inf in message_a_qiwi[:3]:
+            try:
+                await bot_qiwi.send_message(chat_id=-1001603600103, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
+        for send_inf in message_a_cards[:3]:
+            try:
+                await bot_cards.send_message(chat_id=-1001647983723, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
+        for send_inf in message_a_nocards[:3]:
+            try:
+                await bot_nocards.send_message(chat_id=-1001631290076, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
 
-    for send_inf in message_b_qiwi[:3]:
-        try:
-            await bot_qiwi.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
-    for send_inf in message_b_cards[:3]:
-        try:
-            await bot_cards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
-    for send_inf in message_b_nocards[:3]:
-        try:
-            await bot_nocards.send_message(chat_id=user_id, text=send_inf, parse_mode=types.ParseMode.HTML)
-        except (BotBlocked, ChatNotFound, RetryAfter):
-            pass
+        for send_inf in message_b_qiwi[:3]:
+            try:
+                await bot_qiwi.send_message(chat_id=-1001603600103, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
+        for send_inf in message_b_cards[:3]:
+            try:
+                await bot_cards.send_message(chat_id=-1001647983723, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
+        for send_inf in message_b_nocards[:3]:
+            try:
+                await bot_nocards.send_message(chat_id=-1001631290076, text=send_inf, parse_mode=types.ParseMode.HTML)
+            except (BotBlocked, ChatNotFound, RetryAfter):
+                pass
+            await asyncio.sleep(1)
+
+
 
 
 async def start():
@@ -173,7 +213,7 @@ async def start():
         records_list = sql_command("""SELECT * from settings_bestchange_binance""", path_settings_bestchange_binance_db)
 
         text = parse_all_from_bch()
-       # await send_info_legacy(msg=filter_params(0.4, text[0], text[1]))
+        await send_info([], msg=filter_params(0.5, text[0], text[1]))
 
         coros_1 = []
         for iterate, user in enumerate(records_list):

@@ -1,5 +1,5 @@
 import re
-# import time
+import time
 from binance.client import Client
 import pandas as pd
 
@@ -7,7 +7,7 @@ from best_change_parser import read_data
 from bin_parse import find_all_pairs_bc, find_all_pairs_ca
 
 from aiogram.utils.markdown import hlink
-
+from requests.exceptions import ConnectTimeout 
 
 
 api_key = 's4v3IIr7nIRCAO13S1iyM3Yx1sR2X6ExMSxOEnk2cEMiE44QuAxpTNUQI2iRvzTN'
@@ -34,7 +34,7 @@ def prof(buy_p, sell_p):
 
 
 BLACK_LIST = ['Наличные', 'Perfect Money', 'UNI RUB']
-BLACK_LIST_EX = ['ExBox', 'Changelly', 'AvanChange', 'OpenChange', 'МультиВал', 'ImExchanger', 'ExchangeTeam', 'CryptoPay24', 'Quickex', 'FixedFloat', 'Exolix', 'E-Scrooge']
+BLACK_LIST_EX = ['ExBox', 'Changelly', 'AvanChange', 'OpenChange', 'МультиВал', 'ImExchanger', 'ExchangeTeam', 'CryptoPay24', 'Quickex', 'FixedFloat', 'Exolix', 'E-Scrooge', 'CoinJoin']
 # ХЗ насчет Changelly, может и норм, но заебал спамить в 1 момент
 
 def check_BL(offer):
@@ -120,7 +120,7 @@ def filter_params(min_percent, a_level, b_level):
 
 init_points = {'ETH': ['Ethereum (ETH)'],
                'RUB': ["QIWI RUB", "Тинькофф", "Сбербанк"],
-               'USDT': ["Tether Omni (USDT)", "Tether TRC20 (USDT)", "Tether BEP20 (USDT)"], # "Tether ERC20 (USDT)"
+               'USDT': ["Tether TRC20 (USDT)", "Tether BEP20 (USDT)"], # "Tether ERC20 (USDT)"  "Tether Omni (USDT)"
                'USDC': ["USDC"],
                'TUSD': ["TrueUSD"],
                'USDP': ["Pax Dollar"],
@@ -168,7 +168,7 @@ def start_parse_bch(token, sources, ALL_TICKERS, BCH_DATA):
                 'get': best_offer['id_currency_get'],
                 'buy_rate': best_offer['course_give_away'],
                 'sell_rate': rub_table[cur][1],
-                'profit': prof(best_offer['course_give_away'], rub_table[cur][0])})
+                'profit': prof(best_offer['course_give_away'], rub_table[cur][0] * (1-0.001))})
 
     #  начинаме построение коридоров уровня бэ. по=хорошему надо сделать рекурсивно
     #
@@ -187,7 +187,7 @@ def start_parse_bch(token, sources, ALL_TICKERS, BCH_DATA):
             best_offer = lowest_price_in_list(rub_rates[medium_cur][payment_method])
             for final_cur in possible_currents:
                 final_rate = float(best_offer['course_give_away']) * (
-                        medium_cur_table[final_cur][0] * (1 + 0.002))  # APPROX
+                        medium_cur_table[final_cur][0] )  # APPROX
                 b_level.append({'paymeth': pay, 'exchange_name': best_offer['id_exchange'],
                                 'give': best_offer['id_currency_give_away'],
                                 'get': best_offer['id_currency_get'],
@@ -198,12 +198,17 @@ def start_parse_bch(token, sources, ALL_TICKERS, BCH_DATA):
                                 'medium_rate': medium_cur_table[final_cur][1],
                                 'sell_rate': rub_table[final_cur][1],
 
-                                'profit': prof(final_rate, rub_table[final_cur][0])})
+                                'profit': prof(final_rate, rub_table[final_cur][0]*(1-0.002))})
     return a_level, b_level
 
 
 def parse_all_from_bch():
-    client = Client(api_key, api_secret)
+    try:
+        client = Client()
+    except ConnectTimeout as err:
+        print(err)
+        time.sleep(1)
+        client = Client()
     all_tick = client.get_orderbook_tickers()
     bch = read_data()
     all_a_level = []
